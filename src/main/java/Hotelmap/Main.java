@@ -1,6 +1,4 @@
-import hotelevents.HotelEvent;
-import hotelevents.HotelEventListener;
-import hotelevents.HotelEventManager;
+package Hotelmap;
 
 public class Main {
 
