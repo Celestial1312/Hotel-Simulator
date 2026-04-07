@@ -70,4 +70,7 @@ public class Simulation {
             throw new RuntimeException(e);
         }
     }
+
+    public void pause() {
+    }
 }

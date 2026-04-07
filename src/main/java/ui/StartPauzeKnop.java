@@ -1,4 +1,4 @@
-package ui;
+/* package ui;
 
 import simulation.Simulation;
 
@@ -11,16 +11,18 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class SidebarPanel extends JPanel {
+
     private final Simulation simulation;
 
     public SidebarPanel(Simulation simulation) {
         this.simulation = simulation;
 
-       setPreferredSize(new Dimension(600, 1080));
-       setBackground(Color.GRAY);
-       setLayout(new GridBagLayout());
 
-        JButton uploadButton = new JButton("Upload JSON");
+        setPreferredSize(new Dimension(600, 1080));
+        setBackground(Color.GRAY);
+        setLayout(new GridBagLayout());
+
+       /* JButton uploadButton = new JButton("Upload JSON");
         JButton chooseLayoutButton = new JButton("Choose Layout");
         JButton startButton = new JButton("Start");
         JButton pauseButton = new JButton("Pause");
@@ -34,14 +36,7 @@ public class SidebarPanel extends JPanel {
         pauseButton.setPreferredSize(size);
         instellingen.setPreferredSize(size);
 
-
-        add(uploadButton);
-       add(chooseLayoutButton);
-        add(startButton);
-        add(pauseButton);
-        add(instellingen);
-
-
+        // Layout setup
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
@@ -58,7 +53,7 @@ public class SidebarPanel extends JPanel {
         gbc.gridy = 3;
         add(pauseButton, gbc);
 
-        gbc.gridy = 4;
+        gbc.gridy = 4; // 👈 ADDED
         add(instellingen, gbc);
 
         uploadButton.addActionListener(e -> uploadJson());
@@ -80,8 +75,6 @@ public class SidebarPanel extends JPanel {
 
         // Initial state
         pauseButton.setEnabled(false);
-
-
     }
 
     private void uploadJson() {
@@ -190,6 +183,7 @@ public class SidebarPanel extends JPanel {
             }
         }
     }
+
     private void openSettings() {
         JFrame settingsFrame = new JFrame("Instellingen");
         settingsFrame.setSize(300, 200);
@@ -214,3 +208,4 @@ public class SidebarPanel extends JPanel {
         settingsFrame.setVisible(true);
     }
 }
+*/
