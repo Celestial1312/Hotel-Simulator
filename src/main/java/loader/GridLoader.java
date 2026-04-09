@@ -46,4 +46,56 @@ public class GridLoader {
 
         return Math.max(maxX, maxY);
     }
+
+    public List<Area> ReadableJsonFile(File file) throws IOException {
+        List<Area> areas = mapper.readValue(
+                file, new TypeReference<List<Area>>() {
+
+                }
+        );
+
+        return areas;
+    }
+
+    public boolean CheckForLobby(List<Area> areas) {
+        for (Area area : areas) {
+            if ("Lobby".equals(area.getAreaType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean CheckForStairs(List<Area> areas) {
+        for (Area area : areas) {
+            if ("Stairs".equals(area.getAreaType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean CheckForLift(List<Area> areas) {
+        for (Area area : areas) {
+            if ("Lift".equals(area.getAreaType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean CheckForSLL(List<Area> areas) {
+        for (Area area : areas) {
+            Boolean LobbyAvailable = CheckForLobby(areas);
+            Boolean StairsAvailable = CheckForStairs(areas);
+            Boolean LiftAvailable = CheckForLift(areas);
+            if (LobbyAvailable && StairsAvailable && LiftAvailable) {
+                return true;
+            }
+            return false;
+        }
+
+
+        return false;
+    }
 }

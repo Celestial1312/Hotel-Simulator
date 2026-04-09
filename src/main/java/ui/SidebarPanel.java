@@ -1,5 +1,7 @@
 package ui;
 
+import loader.GridLoader;
+import model.Area;
 import simulation.Simulation;
 
 import javax.swing.*;
@@ -9,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 public class SidebarPanel extends JPanel {
     private final Simulation simulation;
@@ -56,8 +59,27 @@ public class SidebarPanel extends JPanel {
                         destination.toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
+                GridLoader loader = new GridLoader();
+                boolean SLLAvailable;
+                try {
+                    List<Area> areas = loader.ReadableJsonFile(destination);
+                    SLLAvailable = loader.CheckForSLL(areas);
 
+                    if(!SLLAvailable){
+                        destination.delete();
+
+                    }
+                }
+                catch (IllegalArgumentException ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException(ex);
+                }
+            if (SLLAvailable) {
                 JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success", JOptionPane.INFORMATION_MESSAGE);
+            }
+                JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+
             } catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
