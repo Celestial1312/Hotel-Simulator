@@ -57,45 +57,36 @@ public class GridLoader {
         return areas;
     }
 
-    public boolean CheckForLobby(List<Area> areas) {
-        for (Area area : areas) {
-            if ("Lobby".equals(area.getAreaType())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean CheckForLobby(Area area) {
+            return "Lobby".equalsIgnoreCase(area.getAreaType());
     }
 
-    public boolean CheckForStairs(List<Area> areas) {
-        for (Area area : areas) {
-            if ("Stairs".equals(area.getAreaType())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean CheckForStairs(Area area) {
+        return "Stairs".equalsIgnoreCase(area.getAreaType());
+
     }
 
-    public boolean CheckForLift(List<Area> areas) {
-        for (Area area : areas) {
-            if ("Lift".equals(area.getAreaType())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean CheckForLift(Area area) {
+        return "Lift".equalsIgnoreCase(area.getAreaType());
     }
 
     public boolean CheckForSLL(List<Area> areas) {
+        boolean LobbyAvailable = false;
+        boolean StairsAvailable = false;
+        boolean LiftAvailable = false;
+
         for (Area area : areas) {
-            Boolean LobbyAvailable = CheckForLobby(areas);
-            Boolean StairsAvailable = CheckForStairs(areas);
-            Boolean LiftAvailable = CheckForLift(areas);
-            if (LobbyAvailable && StairsAvailable && LiftAvailable) {
-                return true;
+            if(CheckForLobby(area)) {
+                 LobbyAvailable = true;
             }
-            return false;
+            if(CheckForStairs(area)) {
+                StairsAvailable = true;
+            }
+            if(CheckForLift(area)) {
+                LiftAvailable = true;
+            }
         }
 
-
-        return false;
+        return LobbyAvailable && StairsAvailable &&  LiftAvailable;
     }
 }

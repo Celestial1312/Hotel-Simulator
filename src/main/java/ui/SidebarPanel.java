@@ -67,7 +67,8 @@ public class SidebarPanel extends JPanel {
 
                     if(!SLLAvailable){
                         destination.delete();
-
+                        JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
                 }
                 catch (IllegalArgumentException ex){
@@ -75,10 +76,7 @@ public class SidebarPanel extends JPanel {
                     JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
                     throw new RuntimeException(ex);
                 }
-            if (SLLAvailable) {
                 JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success", JOptionPane.INFORMATION_MESSAGE);
-            }
-                JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
