@@ -11,15 +11,22 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class SidebarPanel extends JPanel {
+
     private final Simulation simulation;
+
+    // 🎮 Simulation clock variables
+    private int simSeconds = 0;
+    private Timer simTimer;
+    private JLabel simClockLabel;
 
     public SidebarPanel(Simulation simulation) {
         this.simulation = simulation;
 
-       setPreferredSize(new Dimension(600, 1080));
-       setBackground(Color.GRAY);
-       setLayout(new GridBagLayout());
+        setPreferredSize(new Dimension(600, 1080));
+        setBackground(Color.GRAY);
+        setLayout(new GridBagLayout());
 
+        // Buttons
         JButton uploadButton = new JButton("Upload JSON");
         JButton chooseLayoutButton = new JButton("Choose Layout");
         JButton startButton = new JButton("Start");
@@ -34,54 +41,97 @@ public class SidebarPanel extends JPanel {
         pauseButton.setPreferredSize(size);
         instellingen.setPreferredSize(size);
 
-
-        add(uploadButton);
-       add(chooseLayoutButton);
-        add(startButton);
-        add(pauseButton);
-        add(instellingen);
-
-
+        // Layout
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        gbc.gridy = 0;
+        // 🕒 Real clock
+        RealTimeKlok(gbc);
+
+        // 🎮 Simulation clock
+        SimulationKlok(gbc);
+
+        // Buttons
+        gbc.gridy = 2;
         add(uploadButton, gbc);
 
-        gbc.gridy = 1;
+        gbc.gridy = 3;
         add(chooseLayoutButton, gbc);
 
-        gbc.gridy = 2;
+        gbc.gridy = 4;
         add(startButton, gbc);
 
-        gbc.gridy = 3;
+        gbc.gridy = 5;
         add(pauseButton, gbc);
 
-        gbc.gridy = 4;
+        gbc.gridy = 6;
         add(instellingen, gbc);
 
+        // Actions
         uploadButton.addActionListener(e -> uploadJson());
         chooseLayoutButton.addActionListener(e -> chooseLayout());
 
         startButton.addActionListener(e -> {
             simulation.start();
+            simTimer.start(); // ▶ start simulation clock
+
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
         });
 
         pauseButton.addActionListener(e -> {
             simulation.pause();
+            simTimer.stop(); // ⏸ pause simulation clock
+
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
         });
 
         instellingen.addActionListener(e -> openSettings());
 
-        // Initial state
         pauseButton.setEnabled(false);
+    }
 
+    // 🕒 REAL CLOCK
+    private void RealTimeKlok(GridBagConstraints gbc) {
+        JLabel clockLabel = new JLabel("00:00:00");
+        clockLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        clockLabel.setForeground(Color.BLACK);
 
+        Timer timer = new Timer(1000, e -> {
+            java.time.LocalTime now = java.time.LocalTime.now();
+            String time = String.format("%02d:%02d:%02d",
+                    now.getHour(),
+                    now.getMinute(),
+                    now.getSecond());
+            clockLabel.setText(time);
+        });
+        timer.start();
+
+        gbc.gridy = 0;
+        add(clockLabel, gbc);
+    }
+
+    // 🎮 SIMULATION CLOCK
+    private void SimulationKlok(GridBagConstraints gbc) {
+        simClockLabel = new JLabel("Sim: 00:00:00");
+        simClockLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        simClockLabel.setForeground(Color.BLUE);
+
+        simTimer = new Timer(1000, e -> {
+            simSeconds++;
+
+            int hours = simSeconds / 3600;
+            int minutes = (simSeconds % 3600) / 60;
+            int seconds = simSeconds % 60;
+
+            String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+            simClockLabel.setText("Sim: " + time);
+        });
+
+        gbc.gridy = 1;
+        add(simClockLabel, gbc);
     }
 
     private void uploadJson() {
@@ -190,6 +240,7 @@ public class SidebarPanel extends JPanel {
             }
         }
     }
+
     private void openSettings() {
         JFrame settingsFrame = new JFrame("Instellingen");
         settingsFrame.setSize(300, 200);

@@ -72,5 +72,57 @@ public class Simulation {
     }
 
     public void pause() {
+
+    }
+
+    public void step() {
     }
 }
+
+
+
+
+/* package simulation;
+
+import config.SimulatorSettings;
+import loader.GridLoader;
+import model.Grid;
+
+import java.io.File;
+import java.io.IOException;
+
+public class Simulation {
+
+    private Grid grid;
+    private final SimulatorSettings settings;
+    private final GridLoader gridLoader;
+
+    public Simulation() {
+        this.settings = new SimulatorSettings();
+        this.gridLoader = new GridLoader();
+    }
+
+    // called ONCE when simulation starts
+    public void init() {
+        int size = settings.getBoardSize();
+        grid = new Grid(size);
+        grid.initialize();
+    }
+
+    // called every tick
+    public void step() {
+        // TODO: your simulation logic here
+    }
+
+    public void loadGridFromJsonFile(File file) {
+        try {
+            this.grid = gridLoader.loadGridFromFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Grid getGrid() {
+        return grid;
+    }
+} */
