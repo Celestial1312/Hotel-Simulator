@@ -1,15 +1,23 @@
 package ui;
 
-import controller.SimulatorController;
-import simulation.Simulation;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardCopyOption; 
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import controller.SimulatorController;
+import loader.GridLoader;
+import model.Area;
 
 public class SidebarPanel extends JPanel {
     private final SimulatorController controller;
@@ -61,8 +69,25 @@ public class SidebarPanel extends JPanel {
                         destination.toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
+                GridLoader loader = new GridLoader();
+                boolean SLLAvailable;
+                try {
+                    List<Area> areas = loader.ReadableJsonFile(destination);
+                    SLLAvailable = loader.CheckForSLL(areas);
 
+                    if(!SLLAvailable){
+                        destination.delete();
+                        JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                catch (IllegalArgumentException ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException(ex);
+                }
                 JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success", JOptionPane.INFORMATION_MESSAGE);
+
             } catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
