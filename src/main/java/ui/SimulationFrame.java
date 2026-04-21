@@ -1,11 +1,12 @@
 package ui;
 
-import simulation.Simulation;
+import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import simulation.Simulation;
 
 public class SimulationFrame extends JFrame {
 
@@ -41,3 +42,37 @@ public class SimulationFrame extends JFrame {
         gridPanel.repaint();
     }
 }
+
+
+
+/* package ui;
+
+import controller.SimulatorController;
+import simulation.Simulation;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class SimulationFrame extends JFrame {
+
+    private final SimulatorController controller;
+
+    public SimulationFrame(Simulation simulation) {
+
+        this.controller = new SimulatorController(simulation);
+
+        setTitle("Hotel-Simulator");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setLayout(new BorderLayout());
+
+        GridPanel gridPanel = new GridPanel(simulation);
+
+        SidebarPanel sidebarPanel = new SidebarPanel(this, controller, simulation);
+
+        add(gridPanel, BorderLayout.CENTER);
+        add(sidebarPanel, BorderLayout.WEST);
+
+        setVisible(true);
+    }
+} */

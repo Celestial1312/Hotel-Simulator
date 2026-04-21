@@ -1,8 +1,8 @@
 package controller;
 
-import simulation.Simulation;
-
 import java.io.File;
+
+import simulation.Simulation;
 
 public class SimulatorController {
     private final Simulation simulation;

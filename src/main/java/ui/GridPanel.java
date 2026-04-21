@@ -1,18 +1,17 @@
 package ui;
 
-import controller.SimulatorController;
+import java.awt.Dimension;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import model.Area;
 import model.Grid;
 import model.Tile;
 import simulation.Simulation;
 
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
-
 public class GridPanel extends JPanel {
+
     private final Simulation simulation;
     private static final int TILE_SIZE = 80;
     private int sizeX = 0;
@@ -38,7 +37,10 @@ public class GridPanel extends JPanel {
         removeAll();
 
         Grid grid = simulation.getGrid();
+
+        // ✅ SAFE CHECK (VERY IMPORTANT)
         if (grid == null) {
+            setPreferredSize(new Dimension(400, 400));
             revalidate();
             repaint();
             return;
@@ -53,7 +55,7 @@ public class GridPanel extends JPanel {
             for (int x = 0; x < grid.getSizeX(); x++) {
                 Tile tile = grid.getTile(x, y);
 
-                if(tile.getArea() == null) {
+                if (tile == null || tile.getArea() == null) {
                     continue;
                 }
 
