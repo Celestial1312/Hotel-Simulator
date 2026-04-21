@@ -1,18 +1,56 @@
 package model;
 
 public class Tile {
-    private Area area;
+
     private int x;
     private int y;
+    private Area area;
+    private final SubTile[][] subTiles;
 
     private Tile up;
     private Tile down;
     private Tile left;
     private Tile right;
 
-    public Tile(int x, int y) {
+    public Tile(int x, int y, int subTilesPerTileX, int subTilesPerTileY) {
         this.x = x;
         this.y = y;
+        this.subTiles = new SubTile[subTilesPerTileX][subTilesPerTileY];
+
+        initializeSubTiles();
+        connectSubTiles();
+    }
+
+    public void initializeSubTiles() {
+        for(int subY = 0; subY < subTiles.length; subY++) {
+            for(int subX = 0; subX < subTiles[subY].length; subX++) {
+                subTiles[subY][subX] = new SubTile(this, subX, subY);
+            }
+        }
+    }
+
+    public void connectSubTiles() {
+        for (int y = 0; y < subTiles.length; y++) {
+            for (int x = 0; x < subTiles[y].length; x++) {
+                SubTile current = subTiles[y][x];
+
+                if(y > 0) {
+                    current.setUp(subTiles[y-1][x]);
+                }
+
+                if(y > subTiles.length - 1) {
+                    current.setDown(subTiles[y+1][x]);
+                }
+
+                if(x > 0) {
+                    current.setLeft(subTiles[y][x-1]);
+                }
+
+                if(x > subTiles[y].length - 1) {
+                    current.setRight(subTiles[y][x+1]);
+                }
+            }
+        }
     }
 
     public int getX() {
@@ -27,7 +65,7 @@ public class Tile {
         this.up = up;
     }
 
-    public Tile getUp(Tile up) {
+    public Tile getUp() {
         return up;
     }
 
@@ -35,7 +73,7 @@ public class Tile {
         this.down = down;
     }
 
-    public Tile getDown(Tile down) {
+    public Tile getDown() {
         return down;
     }
 
@@ -43,7 +81,7 @@ public class Tile {
         this.left = left;
     }
 
-    public Tile getLeft(Tile left) {
+    public Tile getLeft() {
         return left;
     }
 
@@ -51,7 +89,7 @@ public class Tile {
         this.right = right;
     }
 
-    public Tile getRight(Tile right) {
+    public Tile getRight() {
         return right;
     }
 
@@ -63,4 +101,7 @@ public class Tile {
         return area;
     }
 
+    public SubTile[][] getSubTiles() {
+        return subTiles;
+    }
 }

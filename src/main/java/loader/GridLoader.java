@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Grid;
 
 import model.Area;
+import model.Grid;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,20 +20,17 @@ public class GridLoader {
 
     public Grid loadGridFromFile(File file) throws IOException {
         List<Area> areas = mapper.readValue(
-                file, new TypeReference<List<Area>>() {
+                file, new TypeReference<>() {
                 }
         );
 
-        int size = calculateGridSize(areas);
-
-        Grid grid = new Grid(size);
-        grid.initialize();
+        Grid grid = calculateGridSize(areas);
         grid.placeAreas(areas);
 
         return grid;
     }
 
-    private int calculateGridSize(List<Area> areas) {
+    private Grid calculateGridSize(List<Area> areas) {
         int maxX = 0;
         int maxY = 0;
 
@@ -43,8 +41,7 @@ public class GridLoader {
             if (endX > maxX) maxX = endX;
             if (endY > maxY) maxY = endY;
         }
-
-        return Math.max(maxX, maxY);
+        return new Grid(maxX + 1, maxY + 1);
     }
 
     public List<Area> ReadableJsonFile(File file) throws IOException {

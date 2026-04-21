@@ -3,20 +3,29 @@ package model;
 import java.util.List;
 
 public class Grid {
-    private final int size;
+    private int sizeX;
+    private int sizeY;
     private final Tile[][] tiles;
 
-    public Grid(int size) {
-        this.size = size;
-        this.tiles = new Tile[size][size];
+    public Grid(int sizeX, int sizeY) {
+        this.sizeX = sizeX;
+        this.sizeY = sizeY;
+        this.tiles = new Tile[sizeY][sizeX];
+
+        initializeTiles();
+        connectTiles();
     }
 
-    public int getSize() {
-        return size;
+    public int getSizeX() {
+        return sizeX;
     }
 
-    public Tile getTile(int y, int x) {
-        if(y < 0 || y >= size || x < 0 || x >= size) {
+    public int getSizeY() {
+        return sizeY;
+    }
+
+    public Tile getTile(int x, int y) {
+        if(y < 0 || y >= sizeY || x < 0 || x >= sizeX) {
             return null;
         }
         return tiles[y][x];
@@ -26,27 +35,25 @@ public class Grid {
         return tiles;
     }
 
-    public void initialize() {
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-
-                tiles[y][x] = new Tile(x, y);
+    public void initializeTiles() {
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                tiles[y][x] = new Tile(x, y, 4, 4);
             }
         }
 
-        connectTiles();
     }
 
     private void connectTiles() {
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
                 Tile current = tiles[y][x];
 
                 if(y > 0) {
                     current.setUp(tiles[y - 1][x]);
                 }
 
-                if(y < size - 1) {
+                if(y < sizeY - 1) {
                     current.setDown(tiles[y + 1][x]);
                 }
 
@@ -54,7 +61,7 @@ public class Grid {
                     current.setLeft(tiles[y][x - 1]);
                 }
 
-                if(x < size - 1) {
+                if(x < sizeX - 1) {
                     current.setRight(tiles[y][x + 1]);
                 }
             }
@@ -63,8 +70,8 @@ public class Grid {
 
     public void placeAreas(List<Area> areas) {
         for (Area area : areas) {
-            int startX = area.getX() - 1;
-            int startY = area.getY() - 1;
+            int startX = area.getX();
+            int startY = area.getY();
 
             for(int dy = 0; dy < area.getHeight(); dy++) {
                 for(int dx = 0; dx < area.getWidth(); dx++) {
@@ -72,21 +79,40 @@ public class Grid {
                     int currentX = startX + dx;
                     int currentY = startY + dy;
 
-                    Tile tile = getTile(currentY, currentX);
-
-                    if (tile == null) {
-                        throw new IllegalArgumentException(
-                                "Area out of bounds: " + area.getAreaType() +
-                                        " at x=" + area.getX() +
-                                        ", y=" + area.getY() +
-                                        ", width=" + area.getWidth() +
-                                        ", height=" + area.getHeight()
-                        );
-                    }
+                    Tile tile = getTile(currentX, currentY);
 
                     tile.setArea(area);
                 }
             }
         }
+    }
+
+    public SubTile getLobbySpawnTile() {
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                Tile tile = tiles[y][x];
+
+                if(tile.getArea() == null) {
+                    continue;
+                }
+
+                if(!"lobby".equalsIgnoreCase(tile.getArea().getAreaType())) {
+                    continue;
+                }
+
+                SubTile[][] subTiles = tile.getSubTiles();
+
+                for (int subY = 0; subY < subTiles.length; subY++) {
+                    for (int subX = 0; subX < subTiles[subY].length; subX++) {
+                        SubTile subTile = subTiles[subY][subX];
+
+                        if(subTile.getGuest() == null) {
+                            return subTile;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }
