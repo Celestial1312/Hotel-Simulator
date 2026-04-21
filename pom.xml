@@ -20,5 +20,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.15.3</version>
         </dependency>
+        <dependency>
+            <groupId>local.hotelevents</groupId>
+            <artifactId>HotelEventsObs</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/HotelEventsObs.jar</systemPath>
+        </dependency>
     </dependencies>
 </project>

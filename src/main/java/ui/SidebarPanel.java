@@ -1,5 +1,6 @@
 package ui;
 
+import controller.SimulatorController;
 import simulation.Simulation;
 
 import javax.swing.*;
@@ -11,10 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class SidebarPanel extends JPanel {
-    private final Simulation simulation;
+    private final SimulatorController controller;
 
-    public SidebarPanel(Simulation simulation) {
-        this.simulation = simulation;
+    public SidebarPanel(SimulatorController controller) {
+        this.controller = controller;
 
        setPreferredSize(new Dimension(600, 1080));
        setBackground(Color.GRAY);
@@ -22,17 +23,21 @@ public class SidebarPanel extends JPanel {
 
        JButton uploadButton = new JButton("Upload JSON");
        JButton chooseLayoutButton = new JButton("Choose Layout");
+       JButton startSimulationButton = new JButton("Start Simulation");
 
         Dimension size = new Dimension(180, 40);
 
         uploadButton.setPreferredSize(size);
         chooseLayoutButton.setPreferredSize(size);
+        startSimulationButton.setPreferredSize(size);
 
        add(uploadButton);
        add(chooseLayoutButton);
+       add(startSimulationButton);
 
        uploadButton.addActionListener(e -> uploadJson());
        chooseLayoutButton.addActionListener(e -> chooseLayout());
+       startSimulationButton.addActionListener(e -> {controller.startScenario(0);});
     }
 
     private void uploadJson() {
@@ -69,17 +74,9 @@ public class SidebarPanel extends JPanel {
     private void chooseLayout() {
         File layoutsFolder = new File("layouts");
 
-        if(!layoutsFolder.exists() ||  !layoutsFolder.isDirectory()){
-            JOptionPane.showMessageDialog(this, "Layout folder does not exist or is not a directory!", "Layout Failed", JOptionPane.ERROR_MESSAGE);
-        }
-
         File[] jsonFiles = layoutsFolder.listFiles((dir, name) ->
                 name.toLowerCase().endsWith(".json")
         );
-
-        if(jsonFiles == null || jsonFiles.length == 0){
-            JOptionPane.showMessageDialog(this, "Layout folder does not exist or is not a directory!", "Layout Failed", JOptionPane.ERROR_MESSAGE);
-        }
 
         String[] fileNames = new String[jsonFiles.length];
         for(int i = 0; i < jsonFiles.length; i++){
@@ -94,7 +91,7 @@ public class SidebarPanel extends JPanel {
             File selectedFile = new File(layoutsFolder, selectedFileName);
 
             try {
-                simulation.loadGridFromJsonFile(selectedFile);
+                controller.loadLayout(selectedFile);
                 JOptionPane.showMessageDialog(
 
                         this,
