@@ -2,12 +2,17 @@ package simulation;
 
 import config.SimulatorSettings;
 import controller.SimulatorController;
+import hotelevents.HotelEventManager;
+import listener.SimulationEventListener;
 import loader.GridLoader;
 import model.Grid;
+import model.Guest;
+import model.SubTile;
 import ui.SimulationFrame;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Simulation {
@@ -16,17 +21,22 @@ public class Simulation {
     private SimulatorSettings settings;
     private SimulatorController controller;
     private GridLoader gridLoader;
+    private SimulationFrame frame;
+
     private boolean running;
 
-    private final Random random;
-    private SimulationFrame frame;
+    private HotelEventManager manager;
+    private SimulationEventListener listener;
+
+    private HashMap<Integer, Guest> guests = new HashMap<>();
 
     public Simulation() {
         this.settings = new SimulatorSettings();
-        this.controller = new SimulatorController();
+        this.controller = new SimulatorController(this);
         this.gridLoader = new GridLoader();
         this.running = false;
-        this.random = new Random();
+        this.manager = new HotelEventManager();
+        this.listener = new SimulationEventListener(this);
     }
 
     public Grid getGrid() {
@@ -49,14 +59,27 @@ public class Simulation {
         return frame;
     }
 
-    public void start () {
-        int size = settings.getBoardSize();
-
-        grid = new Grid(size);
-        grid.initialize();
-
+    public void startApplication () {
+        manager.register(listener);
         frame = new SimulationFrame(this);
+    }
+
+    public void startScenario(int scenarioId) {
+        manager.setHte(1);
+        manager.start(scenarioId);
         running = true;
+    }
+
+    public void handleCheckIn(int guestId) {
+        SubTile spawnSubTile = grid.getLobbySpawnTile();
+
+        Guest guest = new Guest(guestId, spawnSubTile);
+        spawnSubTile.setGuest(guest);
+        guests.put(guestId, guest);
+
+        frame.refreshGrid();
+
+        System.out.println("CHECK_IN: " + guestId);
     }
 
     public void loadGridFromJsonFile(File file) {

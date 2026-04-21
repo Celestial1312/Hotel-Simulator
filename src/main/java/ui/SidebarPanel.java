@@ -1,26 +1,33 @@
 package ui;
 
-import simulation.Simulation;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardCopyOption; 
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import controller.SimulatorController;
+import loader.GridLoader;
+import model.Area;
 
 public class SidebarPanel extends JPanel {
+    private final SimulatorController controller;
 
-    private final Simulation simulation;
-
-    // 🎮 Simulation clock variables
     private int simSeconds = 0;
     private Timer simTimer;
     private JLabel simClockLabel;
 
-    public SidebarPanel(Simulation simulation) {
-        this.simulation = simulation;
+    public SidebarPanel(SimulatorController controller) {
+        this.controller = controller;
 
         setPreferredSize(new Dimension(600, 1080));
         setBackground(Color.GRAY);
@@ -156,13 +163,24 @@ public class SidebarPanel extends JPanel {
                         destination.toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
+                GridLoader loader = new GridLoader();
+                boolean SLLAvailable;
+                try {
+                    List<Area> areas = loader.ReadableJsonFile(destination);
+                    SLLAvailable = loader.CheckForSLL(areas);
 
-                JOptionPane.showMessageDialog(
-                        this,
-                        "File uploaded successfully!",
-                        "Upload Success",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+                    if(!SLLAvailable){
+                        destination.delete();
+                        JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                catch (IllegalArgumentException ex){
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                    throw new RuntimeException(ex);
+                }
+                JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -179,29 +197,9 @@ public class SidebarPanel extends JPanel {
     private void chooseLayout() {
         File layoutsFolder = new File("layouts");
 
-        if (!layoutsFolder.exists() || !layoutsFolder.isDirectory()) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Layout folder does not exist!",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-
         File[] jsonFiles = layoutsFolder.listFiles((dir, name) ->
                 name.toLowerCase().endsWith(".json")
         );
-
-        if (jsonFiles == null || jsonFiles.length == 0) {
-            JOptionPane.showMessageDialog(
-                    this,
-                    "No JSON layout files found!",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
 
         String[] fileNames = new String[jsonFiles.length];
         for (int i = 0; i < jsonFiles.length; i++) {
@@ -222,7 +220,8 @@ public class SidebarPanel extends JPanel {
             File selectedFile = new File(layoutsFolder, selectedFileName);
 
             try {
-                simulation.loadGridFromJsonFile(selectedFile);
+                controller.loadLayout(selectedFile);
+                JOptionPane.showMessageDialog(
 
                 JOptionPane.showMessageDialog(
                         this,

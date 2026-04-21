@@ -1,29 +1,39 @@
 package ui;
 
+import java.awt.Dimension;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import model.Area;
 import model.Grid;
 import model.Tile;
 import simulation.Simulation;
 
-import javax.swing.*;
-import java.awt.*;
-
 public class GridPanel extends JPanel {
 
     private final Simulation simulation;
-
-    private static final int TILE_SIZE = 40;
-
+    private static final int TILE_SIZE = 80;
+    private int sizeX = 0;
+    private int sizeY = 0;
     public GridPanel(Simulation simulation) {
         this.simulation = simulation;
 
-        setLayout(null);
+        Grid grid = simulation.getGrid();
+        if(grid != null) {
+            sizeX = grid.getSizeX();
+            sizeY = grid.getSizeY();
+        }
 
-        // ❌ DO NOT access grid here
-        setPreferredSize(new Dimension(400, 400));
+        setLayout(null);
+        setPreferredSize(new Dimension(sizeX * TILE_SIZE, sizeY * TILE_SIZE));
+
+        if(grid != null) {
+            createGrid();
+        }
     }
 
-    public void rebuildGrid() {
-
+    public void createGrid() {
         removeAll();
 
         Grid grid = simulation.getGrid();
@@ -36,35 +46,25 @@ public class GridPanel extends JPanel {
             return;
         }
 
-        int size = grid.getSize();
-
         setPreferredSize(new Dimension(
-                size * TILE_SIZE,
-                size * TILE_SIZE
+                grid.getSizeX() * TILE_SIZE,
+                grid.getSizeY() * TILE_SIZE
         ));
 
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-
-                Tile tile = grid.getTile(y, x);
+        for (int y = 0; y < grid.getSizeY(); y++) {
+            for (int x = 0; x < grid.getSizeX(); x++) {
+                Tile tile = grid.getTile(x, y);
 
                 if (tile == null || tile.getArea() == null) {
                     continue;
                 }
 
-                TileLabel label = new TileLabel(tile);
+                Area area = tile.getArea();
 
-                label.setBounds(
-                        x * TILE_SIZE,
-                        y * TILE_SIZE,
-                        TILE_SIZE,
-                        TILE_SIZE
-                );
-
-                add(label);
+                JLabel areaLabel = new AreaLabel(area, grid, TILE_SIZE);
+                add(areaLabel);
             }
         }
-
         revalidate();
         repaint();
     }

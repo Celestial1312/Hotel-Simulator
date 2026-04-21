@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Grid;
 
 import model.Area;
+import model.Grid;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,20 +20,17 @@ public class GridLoader {
 
     public Grid loadGridFromFile(File file) throws IOException {
         List<Area> areas = mapper.readValue(
-                file, new TypeReference<List<Area>>() {
+                file, new TypeReference<>() {
                 }
         );
 
-        int size = calculateGridSize(areas);
-
-        Grid grid = new Grid(size);
-        grid.initialize();
+        Grid grid = calculateGridSize(areas);
         grid.placeAreas(areas);
 
         return grid;
     }
 
-    private int calculateGridSize(List<Area> areas) {
+    private Grid calculateGridSize(List<Area> areas) {
         int maxX = 0;
         int maxY = 0;
 
@@ -43,7 +41,49 @@ public class GridLoader {
             if (endX > maxX) maxX = endX;
             if (endY > maxY) maxY = endY;
         }
+        return new Grid(maxX + 1, maxY + 1);
+    }
 
-        return Math.max(maxX, maxY);
+    public List<Area> ReadableJsonFile(File file) throws IOException {
+        List<Area> areas = mapper.readValue(
+                file, new TypeReference<List<Area>>() {
+
+                }
+        );
+
+        return areas;
+    }
+
+    public boolean CheckForLobby(Area area) {
+            return "Lobby".equalsIgnoreCase(area.getAreaType());
+    }
+
+    public boolean CheckForStairs(Area area) {
+        return "Stairs".equalsIgnoreCase(area.getAreaType());
+
+    }
+
+    public boolean CheckForLift(Area area) {
+        return "Lift".equalsIgnoreCase(area.getAreaType());
+    }
+
+    public boolean CheckForSLL(List<Area> areas) {
+        boolean LobbyAvailable = false;
+        boolean StairsAvailable = false;
+        boolean LiftAvailable = false;
+
+        for (Area area : areas) {
+            if(CheckForLobby(area)) {
+                 LobbyAvailable = true;
+            }
+            if(CheckForStairs(area)) {
+                StairsAvailable = true;
+            }
+            if(CheckForLift(area)) {
+                LiftAvailable = true;
+            }
+        }
+
+        return LobbyAvailable && StairsAvailable &&  LiftAvailable;
     }
 }

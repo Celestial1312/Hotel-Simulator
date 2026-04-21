@@ -1,13 +1,14 @@
 package ui;
 
+import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import simulation.Simulation;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-public class SimulationFrame extends JFrame implements ActionListener {
+public class SimulationFrame extends JFrame {
 
     private final Simulation simulation;
     private GridPanel gridPanel;
@@ -21,7 +22,7 @@ public class SimulationFrame extends JFrame implements ActionListener {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         gridPanel = new GridPanel(simulation);
-        sidebarPanel = new SidebarPanel(simulation);
+        sidebarPanel = new SidebarPanel(simulation.getController());
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.add(gridPanel);
@@ -36,17 +37,10 @@ public class SimulationFrame extends JFrame implements ActionListener {
     }
 
     public void refreshGrid() {
-        gridPanel.rebuildGrid();
+        gridPanel.createGrid();
         gridPanel.revalidate();
         gridPanel.repaint();
     }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
-
 }
 
 
