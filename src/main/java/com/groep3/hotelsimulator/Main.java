@@ -1,8 +1,8 @@
 package com.groep3.hotelsimulator;
 
-import simulation.Simulation;
+import javax.swing.SwingUtilities;
 
-import javax.swing.*;
+import simulation.Simulation;
 
 public class Main {
 
@@ -13,25 +13,3 @@ public class Main {
         });
     }
 }
-
-
-/* package com.groep3.hotelsimulator;
-
-import simulation.Simulation;
-import ui.SimulationFrame;
-
-import javax.swing.SwingUtilities;
-
-public class Main {
-
-    public static void main(String[] args) {
-
-        SwingUtilities.invokeLater(() -> {
-
-            Simulation simulation = new Simulation();
-
-            // ✅ THIS is what starts your program
-            new SimulationFrame(simulation);
-        });
-    }
-}*/

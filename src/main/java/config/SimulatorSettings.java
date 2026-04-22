@@ -2,13 +2,17 @@ package config;
 
 public class SimulatorSettings {
 
-    private int BoardSize;
+    private int hte;
 
     public SimulatorSettings() {
-        this.BoardSize = 0;
+       this.hte = 100; 
     }
 
-    public int getBoardSize() {
-        return BoardSize;
+    public int getHte() {
+        return hte;
+    }
+
+    public void setHte(int hte) {
+        this.hte = hte;
     }
 }

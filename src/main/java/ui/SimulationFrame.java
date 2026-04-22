@@ -42,37 +42,3 @@ public class SimulationFrame extends JFrame {
         gridPanel.repaint();
     }
 }
-
-
-
-/* package ui;
-
-import controller.SimulatorController;
-import simulation.Simulation;
-
-import javax.swing.*;
-import java.awt.*;
-
-public class SimulationFrame extends JFrame {
-
-    private final SimulatorController controller;
-
-    public SimulationFrame(Simulation simulation) {
-
-        this.controller = new SimulatorController(simulation);
-
-        setTitle("Hotel-Simulator");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setLayout(new BorderLayout());
-
-        GridPanel gridPanel = new GridPanel(simulation);
-
-        SidebarPanel sidebarPanel = new SidebarPanel(this, controller, simulation);
-
-        add(gridPanel, BorderLayout.CENTER);
-        add(sidebarPanel, BorderLayout.WEST);
-
-        setVisible(true);
-    }
-} */

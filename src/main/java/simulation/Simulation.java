@@ -1,5 +1,9 @@
 package simulation;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+
 import config.SimulatorSettings;
 import controller.SimulatorController;
 import hotelevents.HotelEventManager;
@@ -9,11 +13,6 @@ import model.Grid;
 import model.Guest;
 import model.SubTile;
 import ui.SimulationFrame;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
 
 public class Simulation {
 
@@ -34,9 +33,9 @@ public class Simulation {
         this.settings = new SimulatorSettings();
         this.controller = new SimulatorController(this);
         this.gridLoader = new GridLoader();
-        this.running = false;
         this.manager = new HotelEventManager();
         this.listener = new SimulationEventListener(this);
+        this.running = false;
     }
 
     public Grid getGrid() {
@@ -65,9 +64,14 @@ public class Simulation {
     }
 
     public void startScenario(int scenarioId) {
-        manager.setHte(1);
+        manager.setHte(settings.getHte());
         manager.start(scenarioId);
         running = true;
+    }
+
+    public void pauseScenario() {
+        manager.pauze();
+        running = false;
     }
 
     public void handleCheckIn(int guestId) {
@@ -93,59 +97,4 @@ public class Simulation {
             throw new RuntimeException(e);
         }
     }
-
-    public void pause() {
-
-    }
-
-    public void step() {
-    }
 }
-
-
-
-
-/* package simulation;
-
-import config.SimulatorSettings;
-import loader.GridLoader;
-import model.Grid;
-
-import java.io.File;
-import java.io.IOException;
-
-public class Simulation {
-
-    private Grid grid;
-    private final SimulatorSettings settings;
-    private final GridLoader gridLoader;
-
-    public Simulation() {
-        this.settings = new SimulatorSettings();
-        this.gridLoader = new GridLoader();
-    }
-
-    // called ONCE when simulation starts
-    public void init() {
-        int size = settings.getBoardSize();
-        grid = new Grid(size);
-        grid.initialize();
-    }
-
-    // called every tick
-    public void step() {
-        // TODO: your simulation logic here
-    }
-
-    public void loadGridFromJsonFile(File file) {
-        try {
-            this.grid = gridLoader.loadGridFromFile(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Grid getGrid() {
-        return grid;
-    }
-} */

@@ -2,7 +2,10 @@ package ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,8 +14,11 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import controller.SimulatorController;
@@ -21,10 +27,7 @@ import model.Area;
 
 public class SidebarPanel extends JPanel {
     private final SimulatorController controller;
-
-    private int simSeconds = 0;
-    private Timer simTimer;
-    private JLabel simClockLabel;
+    private boolean layoutChosen = false;
 
     public SidebarPanel(SimulatorController controller) {
         this.controller = controller;
@@ -32,13 +35,15 @@ public class SidebarPanel extends JPanel {
         setPreferredSize(new Dimension(600, 1080));
         setBackground(Color.GRAY);
         setLayout(new GridBagLayout());
+        
+        SimulationClock simulationClock = new SimulationClock(controller.getHte());
+        RealTimeClock realTimeClock = new RealTimeClock();
 
-        // Buttons
         JButton uploadButton = new JButton("Upload JSON");
         JButton chooseLayoutButton = new JButton("Choose Layout");
         JButton startButton = new JButton("Start");
         JButton pauseButton = new JButton("Pause");
-        JButton instellingen = new JButton("Instellingen");
+        JButton settings = new JButton("Settings");
 
         Dimension size = new Dimension(180, 40);
 
@@ -46,20 +51,18 @@ public class SidebarPanel extends JPanel {
         chooseLayoutButton.setPreferredSize(size);
         startButton.setPreferredSize(size);
         pauseButton.setPreferredSize(size);
-        instellingen.setPreferredSize(size);
+        settings.setPreferredSize(size);
 
-        // Layout
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
+    
+        gbc.gridy = 0;
+        add(realTimeClock, gbc);
 
-        // 🕒 Real clock
-        RealTimeKlok(gbc);
+        gbc.gridy = 1;
+        add(simulationClock, gbc);
 
-        // 🎮 Simulation clock
-        SimulationKlok(gbc);
-
-        // Buttons
         gbc.gridy = 2;
         add(uploadButton, gbc);
 
@@ -73,76 +76,44 @@ public class SidebarPanel extends JPanel {
         add(pauseButton, gbc);
 
         gbc.gridy = 6;
-        add(instellingen, gbc);
+        add(settings, gbc);
 
-        // Actions
         uploadButton.addActionListener(e -> uploadJson());
         chooseLayoutButton.addActionListener(e -> chooseLayout());
 
         startButton.addActionListener(e -> {
-            simulation.start();
-            simTimer.start(); // ▶ start simulation clock
+            if(!layoutChosen) {
+                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            controller.startScenario(0);
+            simulationClock.start();
 
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
         });
 
         pauseButton.addActionListener(e -> {
-            simulation.pause();
-            simTimer.stop(); // ⏸ pause simulation clock
+            if(!layoutChosen) {
+                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            controller.pauseScenario();
+            simulationClock.stop();
 
             startButton.setEnabled(true);
             pauseButton.setEnabled(false);
         });
 
-        instellingen.addActionListener(e -> openSettings());
-
-        pauseButton.setEnabled(false);
-    }
-
-    // 🕒 REAL CLOCK
-    private void RealTimeKlok(GridBagConstraints gbc) {
-        JLabel clockLabel = new JLabel("00:00:00");
-        clockLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        clockLabel.setForeground(Color.BLACK);
-
-        Timer timer = new Timer(1000, e -> {
-            java.time.LocalTime now = java.time.LocalTime.now();
-            String time = String.format("%02d:%02d:%02d",
-                    now.getHour(),
-                    now.getMinute(),
-                    now.getSecond());
-            clockLabel.setText(time);
-        });
-        timer.start();
-
-        gbc.gridy = 0;
-        add(clockLabel, gbc);
-    }
-
-    // 🎮 SIMULATION CLOCK
-    private void SimulationKlok(GridBagConstraints gbc) {
-        simClockLabel = new JLabel("Sim: 00:00:00");
-        simClockLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        simClockLabel.setForeground(Color.BLUE);
-
-        simTimer = new Timer(1000, e -> {
-            simSeconds++;
-
-            int hours = simSeconds / 3600;
-            int minutes = (simSeconds % 3600) / 60;
-            int seconds = simSeconds % 60;
-
-            String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-            simClockLabel.setText("Sim: " + time);
-        });
-
-        gbc.gridy = 1;
-        add(simClockLabel, gbc);
+        settings.addActionListener(e -> openSettings());
     }
 
     private void uploadJson() {
         JFileChooser chooser = new JFileChooser();
+        GridLoader loader = new GridLoader();
+
+        boolean SLLAvailable;
+        
         chooser.setFileFilter(new FileNameExtensionFilter("JSON Files", "json"));
 
         int result = chooser.showOpenDialog(this);
@@ -163,8 +134,6 @@ public class SidebarPanel extends JPanel {
                         destination.toPath(),
                         StandardCopyOption.REPLACE_EXISTING
                 );
-                GridLoader loader = new GridLoader();
-                boolean SLLAvailable;
                 try {
                     List<Area> areas = loader.ReadableJsonFile(destination);
                     SLLAvailable = loader.CheckForSLL(areas);
@@ -221,8 +190,7 @@ public class SidebarPanel extends JPanel {
 
             try {
                 controller.loadLayout(selectedFile);
-                JOptionPane.showMessageDialog(
-
+                layoutChosen = true;
                 JOptionPane.showMessageDialog(
                         this,
                         "Loaded layout: " + selectedFileName

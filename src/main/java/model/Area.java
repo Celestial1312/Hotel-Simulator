@@ -3,8 +3,6 @@ package model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.sql.Struct;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Area {
 

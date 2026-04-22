@@ -18,5 +18,17 @@ public class SimulatorController {
     public void startScenario(int scenarioId) {
         simulation.startScenario(scenarioId);
     }
+
+    public void pauseScenario() {
+        simulation.pauseScenario();
+    }
+
+    public int getHte() {
+        return simulation.getSettings().getHte();
+    }
+
+    public void setHte(int hte) {
+        simulation.getSettings().setHte(hte);
+    }
 }
 

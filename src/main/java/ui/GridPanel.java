@@ -38,7 +38,6 @@ public class GridPanel extends JPanel {
 
         Grid grid = simulation.getGrid();
 
-        // ✅ SAFE CHECK (VERY IMPORTANT)
         if (grid == null) {
             setPreferredSize(new Dimension(400, 400));
             revalidate();

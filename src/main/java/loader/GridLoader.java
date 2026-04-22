@@ -2,10 +2,9 @@ package loader;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import model.Grid;
 
-import model.Area;
 import model.Grid;
+import model.Area;
 
 import java.io.File;
 import java.io.IOException;
