@@ -3,6 +3,7 @@ package simulation;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import config.SimulatorSettings;
 import controller.SimulatorController;
@@ -84,6 +85,16 @@ public class Simulation {
         frame.refreshGrid();
 
         System.out.println("CHECK_IN: " + guestId);
+    }
+    public void handleCheckOut(int guestId) {
+        Guest guest = guests.get(guestId);
+
+        SubTile currentSubtile = guest.getCurrentSubTile();
+
+        currentSubtile.setGuest(null);
+
+        guests.remove(guestId, guest);
+        frame.refreshGrid();
     }
 
     public void loadGridFromJsonFile(File file) {
