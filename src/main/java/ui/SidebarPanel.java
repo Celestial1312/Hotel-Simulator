@@ -28,7 +28,6 @@ import javax.swing.JSlider;
 import javax.swing.JComboBox;
 import model.Guest;
 
-
 public class SidebarPanel extends JPanel {
     private final SimulatorController controller;
     private boolean layoutChosen = false;
@@ -247,9 +246,7 @@ public class SidebarPanel extends JPanel {
                 "Evacuate"
         };
 
-        JComboBox<String> eventBox =
-                new JComboBox<>(events);
-
+        JComboBox<String> eventBox = new JComboBox<>(events);
 
         JButton saveButton = new JButton("Save");
 
@@ -259,24 +256,19 @@ public class SidebarPanel extends JPanel {
 
             controller.setHte(value * 100);
 
-
             JOptionPane.showMessageDialog(
                     settingsFrame,
-                    "Saved: " + value
-            );
-            Guest selectedGuest =
-                    (Guest) guestBox.getSelectedItem();
+                    "Saved: " + value);
+            Guest selectedGuest = (Guest) guestBox.getSelectedItem();
 
-            String selectedEvent =
-                    (String) eventBox.getSelectedItem();
+            String selectedEvent = (String) eventBox.getSelectedItem();
 
             System.out.println(selectedGuest);
 
             System.out.println(selectedEvent);
 
             System.out.println(
-                    selectedGuest + " goes to " + selectedEvent
-            );
+                    selectedGuest + " goes to " + selectedEvent);
 
             settingsFrame.dispose();
         });
@@ -288,10 +280,8 @@ public class SidebarPanel extends JPanel {
         settingsFrame.add(guestLabel);
         settingsFrame.add(guestBox);
 
-
         settingsFrame.add(eventLabel);
         settingsFrame.add(eventBox);
-
 
         settingsFrame.add(saveButton);
 
