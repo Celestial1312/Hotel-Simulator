@@ -52,6 +52,7 @@ public class GridPanel extends JPanel {
 
         for (int y = 0; y < grid.getSizeY(); y++) {
             for (int x = 0; x < grid.getSizeX(); x++) {
+
                 Tile tile = grid.getTile(x, y);
 
                 if (tile == null || tile.getArea() == null) {
@@ -60,10 +61,18 @@ public class GridPanel extends JPanel {
 
                 Area area = tile.getArea();
 
-                JLabel areaLabel = new AreaLabel(area, grid, TILE_SIZE);
+                // Draw each area only once
+                if (x != area.getX() || y != area.getY()) {
+                    continue;
+                }
+
+                JLabel areaLabel =
+                        new AreaLabel(area, grid, TILE_SIZE);
+
                 add(areaLabel);
             }
         }
+
         revalidate();
         repaint();
     }

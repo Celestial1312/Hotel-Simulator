@@ -24,6 +24,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import controller.SimulatorController;
 import loader.GridLoader;
 import model.Area;
+import javax.swing.JSlider;
+import javax.swing.JComboBox;
+import model.Guest;
+
 
 public class SidebarPanel extends JPanel {
     private final SimulatorController controller;
@@ -209,26 +213,89 @@ public class SidebarPanel extends JPanel {
     }
 
     private void openSettings() {
+
         JFrame settingsFrame = new JFrame("Instellingen");
+
         settingsFrame.setSize(300, 200);
+
         settingsFrame.setLayout(new FlowLayout());
 
         JLabel label = new JLabel("Simulation speed:");
-        JTextField speedField = new JTextField(10);
+
+        JSlider speedSlider = new JSlider(1, 10, 5);
+
+        speedSlider.setMajorTickSpacing(1);
+
+        speedSlider.setPaintTicks(true);
+
+        speedSlider.setPaintLabels(true);
+
+        JLabel guestLabel = new JLabel("Choose Guest:");
+
+        JComboBox<Guest> guestBox = new JComboBox<>();
+
+        for (Guest guest : controller.getGuests().values()) {
+            guestBox.addItem(guest);
+        }
+        JLabel eventLabel = new JLabel("Choose Event:");
+
+        String[] events = {
+                "Cinema",
+                "Fitness",
+                "Food",
+                "Evacuate"
+        };
+
+        JComboBox<String> eventBox =
+                new JComboBox<>(events);
+
 
         JButton saveButton = new JButton("Save");
 
         saveButton.addActionListener(e -> {
-            String value = speedField.getText();
-            JOptionPane.showMessageDialog(settingsFrame, "Saved: " + value);
+
+            int value = speedSlider.getValue();
+
+            controller.setHte(value * 100);
+
+
+            JOptionPane.showMessageDialog(
+                    settingsFrame,
+                    "Saved: " + value
+            );
+            Guest selectedGuest =
+                    (Guest) guestBox.getSelectedItem();
+
+            String selectedEvent =
+                    (String) eventBox.getSelectedItem();
+
+            System.out.println(selectedGuest);
+
+            System.out.println(selectedEvent);
+
+            System.out.println(
+                    selectedGuest + " goes to " + selectedEvent
+            );
+
             settingsFrame.dispose();
         });
 
         settingsFrame.add(label);
-        settingsFrame.add(speedField);
+
+        settingsFrame.add(speedSlider);
+
+        settingsFrame.add(guestLabel);
+        settingsFrame.add(guestBox);
+
+
+        settingsFrame.add(eventLabel);
+        settingsFrame.add(eventBox);
+
+
         settingsFrame.add(saveButton);
 
         settingsFrame.setLocationRelativeTo(this);
+
         settingsFrame.setVisible(true);
     }
 }

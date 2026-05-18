@@ -38,7 +38,7 @@ public class Tile {
                     current.setUp(subTiles[y-1][x]);
                 }
 
-                if(y > subTiles.length - 1) {
+                if(y < subTiles.length - 1) {
                     current.setDown(subTiles[y+1][x]);
                 }
 
@@ -46,7 +46,7 @@ public class Tile {
                     current.setLeft(subTiles[y][x-1]);
                 }
 
-                if(x > subTiles[y].length - 1) {
+                if(x < subTiles[y].length - 1) {
                     current.setRight(subTiles[y][x+1]);
                 }
             }

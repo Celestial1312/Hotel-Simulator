@@ -5,7 +5,7 @@ public class SimulatorSettings {
     private int hte;
 
     public SimulatorSettings() {
-       this.hte = 100;
+       this.hte = 1000;
     }
 
     public int getHte() {

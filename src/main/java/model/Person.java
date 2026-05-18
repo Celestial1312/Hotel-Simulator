@@ -33,4 +33,9 @@ public abstract class Person {
     public void setTargetTile(Tile targetTile) {
         this.targetTile = targetTile;
     }
+
+    @Override
+    public String toString() {
+        return "Guest " + id;
+    }
 }

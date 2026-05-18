@@ -14,6 +14,8 @@ import model.Grid;
 import model.Guest;
 import model.SubTile;
 import ui.SimulationFrame;
+import java.util.Random;
+import java.util.ArrayList;
 
 public class Simulation {
 
@@ -29,6 +31,8 @@ public class Simulation {
     private SimulationEventListener listener;
 
     private HashMap<Integer, Guest> guests = new HashMap<>();
+
+    private final Random random = new Random();
 
     public Simulation() {
         this.settings = new SimulatorSettings();
@@ -58,6 +62,9 @@ public class Simulation {
     public SimulationFrame getFrame() {
         return frame;
     }
+    public HashMap<Integer, Guest> getGuests() {
+        return guests;
+    }
 
     public void startApplication () {
         manager.register(listener);
@@ -83,6 +90,7 @@ public class Simulation {
         guests.put(guestId, guest);
 
         frame.refreshGrid();
+        moveGuestRandomly(guest);
 
         System.out.println("CHECK_IN: " + guestId);
     }
@@ -107,5 +115,49 @@ public class Simulation {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void moveGuestRandomly(Guest guest) {
+
+        SubTile current = guest.getCurrentSubTile();
+
+        ArrayList<SubTile> possibleMoves = new ArrayList<>();
+
+        if(current.getUp() != null)
+            possibleMoves.add(current.getUp());
+
+        if(current.getDown() != null)
+            possibleMoves.add(current.getDown());
+
+        if(current.getLeft() != null)
+            possibleMoves.add(current.getLeft());
+
+        if(current.getRight() != null)
+            possibleMoves.add(current.getRight());
+
+        if(possibleMoves.isEmpty()) {
+            return;
+        }
+
+        SubTile next =
+                possibleMoves.get(
+                        random.nextInt(possibleMoves.size())
+                );
+
+        if(next == null) {
+            return;
+        }
+
+        if(next.getGuest() != null) {
+            return;
+        }
+
+        current.setGuest(null);
+
+        next.setGuest(guest);
+
+        guest.setCurrentSubTile(next);
+
+        frame.refreshGrid();
     }
 }
