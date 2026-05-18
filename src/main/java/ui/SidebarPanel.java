@@ -9,7 +9,7 @@ import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption; 
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -35,7 +35,7 @@ public class SidebarPanel extends JPanel {
         setPreferredSize(new Dimension(600, 1080));
         setBackground(Color.GRAY);
         setLayout(new GridBagLayout());
-        
+
         SimulationClock simulationClock = new SimulationClock(controller.getHte());
         RealTimeClock realTimeClock = new RealTimeClock();
 
@@ -56,7 +56,7 @@ public class SidebarPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.insets = new Insets(10, 10, 10, 10);
-    
+
         gbc.gridy = 0;
         add(realTimeClock, gbc);
 
@@ -82,27 +82,33 @@ public class SidebarPanel extends JPanel {
         chooseLayoutButton.addActionListener(e -> chooseLayout());
 
         startButton.addActionListener(e -> {
-            if(!layoutChosen) {
-                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen", JOptionPane.WARNING_MESSAGE);
+            if (!layoutChosen) {
+                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            controller.startScenario(0);
+            controller.startScenario(2);
             simulationClock.start();
 
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
+            pauseButton.setText("Pause");
         });
 
         pauseButton.addActionListener(e -> {
-            if(!layoutChosen) {
-                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen", JOptionPane.WARNING_MESSAGE);
+            if (!layoutChosen) {
+                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            controller.pauseScenario();
-            simulationClock.stop();
-
-            startButton.setEnabled(true);
-            pauseButton.setEnabled(false);
+            controller.togglePauseScenario();
+            if (controller.isPaused()) {
+                simulationClock.stop();
+                pauseButton.setText("Resume");
+            } else {
+                simulationClock.start();
+                pauseButton.setText("Pause");
+            }
         });
 
         settings.addActionListener(e -> openSettings());
@@ -113,7 +119,7 @@ public class SidebarPanel extends JPanel {
         GridLoader loader = new GridLoader();
 
         boolean SLLAvailable;
-        
+
         chooser.setFileFilter(new FileNameExtensionFilter("JSON Files", "json"));
 
         int result = chooser.showOpenDialog(this);
@@ -132,24 +138,25 @@ public class SidebarPanel extends JPanel {
                 Files.copy(
                         selectedFile.toPath(),
                         destination.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING
-                );
+                        StandardCopyOption.REPLACE_EXISTING);
                 try {
-                    List<Area> areas = loader.ReadableJsonFile(destination);
+                    List<Area> areas = loader.loadAreasFromFile(destination);
                     SLLAvailable = loader.CheckForSLL(areas);
 
-                    if(!SLLAvailable){
+                    if (!SLLAvailable) {
                         destination.delete();
-                        JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "File does not contain all areas!", "Upload Failed",
+                                JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                }
-                catch (IllegalArgumentException ex){
+                } catch (IllegalArgumentException ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "File upload failed!", "Upload Failed",
+                            JOptionPane.ERROR_MESSAGE);
                     throw new RuntimeException(ex);
                 }
-                JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "File uploaded successfully!", "Upload Success",
+                        JOptionPane.INFORMATION_MESSAGE);
 
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -157,8 +164,7 @@ public class SidebarPanel extends JPanel {
                         this,
                         "File upload failed!",
                         "Upload Failed",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -166,9 +172,7 @@ public class SidebarPanel extends JPanel {
     private void chooseLayout() {
         File layoutsFolder = new File("layouts");
 
-        File[] jsonFiles = layoutsFolder.listFiles((dir, name) ->
-                name.toLowerCase().endsWith(".json")
-        );
+        File[] jsonFiles = layoutsFolder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
         String[] fileNames = new String[jsonFiles.length];
         for (int i = 0; i < jsonFiles.length; i++) {
@@ -182,8 +186,7 @@ public class SidebarPanel extends JPanel {
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 fileNames,
-                fileNames[0]
-        );
+                fileNames[0]);
 
         if (selectedFileName != null) {
             File selectedFile = new File(layoutsFolder, selectedFileName);
@@ -193,8 +196,7 @@ public class SidebarPanel extends JPanel {
                 layoutChosen = true;
                 JOptionPane.showMessageDialog(
                         this,
-                        "Loaded layout: " + selectedFileName
-                );
+                        "Loaded layout: " + selectedFileName);
 
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -202,8 +204,7 @@ public class SidebarPanel extends JPanel {
                         this,
                         ex.getMessage(),
                         "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

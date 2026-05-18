@@ -15,7 +15,7 @@ public class TileLabel extends JLabel {
 
         setLayout(null);
         setOpaque(false);
-        setBorder(new LineBorder(Color.BLACK));
+        // setBorder(new LineBorder(Color.BLACK));
         setBounds(x, y,  tileSize, tileSize);
 
         addSubTiles(tileSize);

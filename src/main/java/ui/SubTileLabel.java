@@ -1,7 +1,8 @@
 package ui;
 
+import model.Guest;
+import model.Cleaner;
 import model.SubTile;
-import model.Tile;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
@@ -15,7 +16,7 @@ public class SubTileLabel extends JLabel {
 
         setLayout(null);
         setOpaque(false);
-        setBorder(new LineBorder(Color.BLACK));
+        // setBorder(new LineBorder(Color.BLACK));
         setBounds(x, y, width, height);
     }
 
@@ -23,8 +24,12 @@ public class SubTileLabel extends JLabel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if(subTile.getGuest() != null) {
+        if(subTile.getPerson() instanceof Guest) {
             g.setColor(Color.BLUE);
+            g.fillOval(getWidth() / 4, getHeight() / 4, getWidth() / 2, getHeight() / 2);
+        }
+        if(subTile.getPerson() instanceof Cleaner) {
+            g.setColor(Color.GREEN);
             g.fillOval(getWidth() / 4, getHeight() / 4, getWidth() / 2, getHeight() / 2);
         }
     }

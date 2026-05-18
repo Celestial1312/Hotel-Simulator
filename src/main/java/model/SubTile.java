@@ -5,7 +5,7 @@ public class SubTile {
     private int x;
     private int y;
 
-    private Guest guest;
+    private Person person;
 
     private SubTile up;
     private SubTile down;
@@ -26,9 +26,8 @@ public class SubTile {
         return y;
     }
 
-
-    public Guest getGuest() {
-        return guest;
+    public Person getPerson() {
+        return person;
     }
 
     public SubTile getUp() {
@@ -47,6 +46,22 @@ public class SubTile {
         return right;
     }
 
+    public Tile getParentTile() {
+        return parentTile;
+    }
+
+    public int getGlobalX() {
+        return parentTile.getX() * parentTile.getSubTileColumns() + x;
+    }
+
+    public int getGlobalY() {
+        return parentTile.getY() * parentTile.getSubTileRows() + y;
+    }
+
+    public boolean isWalkable() {
+        return parentTile.getArea() != null && person == null;
+    }
+
     public void setX(int x) {
         this.x = x;
     }
@@ -55,8 +70,8 @@ public class SubTile {
         this.y = y;
     }
 
-    public void setGuest(Guest guest) {
-        this.guest = guest;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public void setUp(SubTile up) {

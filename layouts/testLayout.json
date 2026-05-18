@@ -7,12 +7,12 @@
 	{
 		"AreaType": "Lift",
 		"Position": "0, 3",
-		"Dimension": "1, 5"
+		"Dimension": "1, 8"
 	},
 	{
 		"AreaType": "Stairs",
 		"Position": "7, 3",
-		"Dimension": "1, 5"
+		"Dimension": "1, 8"
 	},
 	{
 		"AreaType": "Cinema",

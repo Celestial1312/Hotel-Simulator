@@ -22,6 +22,16 @@ public class AreaNameLabel extends JLabel {
                 area.getWidth() * tileSize,
                 area.getHeight() * tileSize
         );
+
+                setToolTipText(
+                "Type: " + area.getAreaType() +
+                        ", x=" + area.getX() +
+                        ", y=" + area.getY() +
+                        ", width=" + area.getWidth() +
+                        ", height=" + area.getHeight() +
+                        ", guest=" + (area.getGuest() == null ? "none" : area.getGuest().getId())
+        );
+
     }
 
 }

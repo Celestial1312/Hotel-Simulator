@@ -8,6 +8,7 @@ import model.Area;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class GridLoader {
@@ -17,16 +18,19 @@ public class GridLoader {
         this.mapper = new ObjectMapper();
     }
 
-    public Grid loadGridFromFile(File file) throws IOException {
-        List<Area> areas = mapper.readValue(
-                file, new TypeReference<>() {
-                }
-        );
+    public List<Area> loadAreasFromFile(File file) throws IOException {
+        return mapper.readValue(file, new TypeReference<List<Area>>() {});
+    }
 
+    public Grid loadGridFromAreas(List<Area> areas) {
         Grid grid = calculateGridSize(areas);
         grid.placeAreas(areas);
-
         return grid;
+    }
+
+    public Grid loadGridFromFile(File file) throws IOException {
+        List<Area> areas = loadAreasFromFile(file);
+        return loadGridFromAreas(areas);
     }
 
     private Grid calculateGridSize(List<Area> areas) {
@@ -37,24 +41,16 @@ public class GridLoader {
             int endX = area.getX() + area.getWidth() - 1;
             int endY = area.getY() + area.getHeight() - 1;
 
-            if (endX > maxX) maxX = endX;
-            if (endY > maxY) maxY = endY;
+            if (endX > maxX)
+                maxX = endX;
+            if (endY > maxY)
+                maxY = endY;
         }
         return new Grid(maxX + 1, maxY + 1);
     }
 
-    public List<Area> ReadableJsonFile(File file) throws IOException {
-        List<Area> areas = mapper.readValue(
-                file, new TypeReference<List<Area>>() {
-
-                }
-        );
-
-        return areas;
-    }
-
     public boolean CheckForLobby(Area area) {
-            return "Lobby".equalsIgnoreCase(area.getAreaType());
+        return "Lobby".equalsIgnoreCase(area.getAreaType());
     }
 
     public boolean CheckForStairs(Area area) {
@@ -72,17 +68,27 @@ public class GridLoader {
         boolean LiftAvailable = false;
 
         for (Area area : areas) {
-            if(CheckForLobby(area)) {
-                 LobbyAvailable = true;
+            if (CheckForLobby(area)) {
+                LobbyAvailable = true;
             }
-            if(CheckForStairs(area)) {
+            if (CheckForStairs(area)) {
                 StairsAvailable = true;
             }
-            if(CheckForLift(area)) {
+            if (CheckForLift(area)) {
                 LiftAvailable = true;
             }
         }
 
-        return LobbyAvailable && StairsAvailable &&  LiftAvailable;
+        return LobbyAvailable && StairsAvailable && LiftAvailable;
+    }
+
+    public List<Area> getListOfRooms(List<Area> areas) {
+        List<Area> rooms = new ArrayList<>();
+        for (Area area : areas) {
+            if (area.getAreaType().equalsIgnoreCase("room")) {
+                rooms.add(area);
+            }
+        }
+        return rooms;
     }
 }

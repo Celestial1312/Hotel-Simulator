@@ -2,7 +2,6 @@ package ui;
 
 import model.Area;
 import model.Grid;
-import model.SubTile;
 import model.Tile;
 
 import javax.swing.*;
@@ -29,15 +28,6 @@ public class AreaLabel extends JLabel {
                 area.getWidth() * tileSize,
                 area.getHeight() * tileSize
         );
-
-        setToolTipText(
-                "Type: " + area.getAreaType() +
-                        ", x=" + area.getX() +
-                        ", y=" + area.getY() +
-                        ", width=" + area.getWidth() +
-                        ", height=" + area.getHeight()
-        );
-
         addTiles(tileSize);
         addAreaNames(tileSize);
     }

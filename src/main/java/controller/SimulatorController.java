@@ -19,10 +19,14 @@ public class SimulatorController {
         simulation.startScenario(scenarioId);
     }
 
-    public void pauseScenario() {
-        simulation.pauseScenario();
+    public void togglePauseScenario() {
+        simulation.togglePauseScenario();
     }
 
+    public boolean isPaused() {
+        return simulation.isPaused();
+    }
+    
     public int getHte() {
         return simulation.getSettings().getHte();
     }
