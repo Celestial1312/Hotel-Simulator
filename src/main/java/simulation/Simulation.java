@@ -28,6 +28,8 @@ import model.SubTile;
 import model.Tile;
 import pathfinding.AStarPathFinding;
 import ui.SimulationFrame;
+import java.util.Random;
+import java.util.ArrayList;
 
 public class Simulation {
 
@@ -48,6 +50,8 @@ public class Simulation {
     private List<Area> rooms = new ArrayList<>();
 
     private Timer simulationTimer;
+
+    private final Random random = new Random();
 
     public Simulation() {
         this.settings = new SimulatorSettings();
@@ -90,6 +94,9 @@ public class Simulation {
 
     public SimulationFrame getFrame() {
         return frame;
+    }
+    public HashMap<Integer, Guest> getGuests() {
+        return guests;
     }
 
     public void startApplication() {

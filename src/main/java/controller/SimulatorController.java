@@ -1,7 +1,9 @@
 package controller;
 
 import java.io.File;
+import java.util.HashMap;
 
+import model.Guest;
 import simulation.Simulation;
 
 public class SimulatorController {
@@ -33,6 +35,9 @@ public class SimulatorController {
 
     public void setHte(int hte) {
         simulation.getSettings().setHte(hte);
+    }
+    public HashMap<Integer, Guest> getGuests() {
+        return simulation.getGuests();
     }
 }
 
