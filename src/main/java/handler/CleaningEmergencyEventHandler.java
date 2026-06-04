@@ -1,4 +1,4 @@
-package listener;
+package handler;
 
 import hotelevents.HotelEvent;
 import simulation.Simulation;

@@ -25,6 +25,7 @@ public class SimulationFrame extends JFrame {
         sidebarPanel = new SidebarPanel(simulation.getController());
 
         JPanel centerPanel = new JPanel(new GridBagLayout());
+        
         centerPanel.add(gridPanel);
         add(centerPanel, BorderLayout.CENTER);
 
@@ -32,12 +33,12 @@ public class SimulationFrame extends JFrame {
         sidePanel.add(sidebarPanel);
         add(sidePanel, BorderLayout.WEST);
 
-
         setVisible(true);
     }
 
     public void refreshGrid() {
-        gridPanel.createGrid();
+        gridPanel.updatePreferredSize();
+        gridPanel.updateLobbyRectangle();
         gridPanel.revalidate();
         gridPanel.repaint();
     }

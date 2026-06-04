@@ -10,13 +10,13 @@ import javax.swing.Timer;
 
 import config.SimulatorSettings;
 import controller.SimulatorController;
+import handler.CheckInEventHandler;
+import handler.CheckOutEventHandler;
+import handler.CleaningEmergencyEventHandler;
+import handler.GoToCinemaEventHandler;
+import handler.GoToFitnessEventHandler;
+import handler.NeedFoodEventHandler;
 import hotelevents.HotelEventManager;
-import listener.CheckInEventHandler;
-import listener.CheckOutEventHandler;
-import listener.CleaningEmergencyEventHandler;
-import listener.GoToCinemaEventHandler;
-import listener.GoToFitnessEventHandler;
-import listener.NeedFoodEventHandler;
 import listener.SimulationEventListener;
 import loader.GridLoader;
 import model.Area;
@@ -90,6 +90,10 @@ public class Simulation {
 
     public SimulationFrame getFrame() {
         return frame;
+    }
+
+    public HashMap<Integer, Guest> getGuests() {
+        return guests;
     }
 
     public void startApplication() {
@@ -411,5 +415,14 @@ public class Simulation {
         }
 
         return null;
+    }
+
+    public void refreshHte() {
+        int hte = settings.getHte();
+
+        manager.setHte(hte);
+
+        simulationTimer.setDelay(hte);
+        simulationTimer.setInitialDelay(hte);
     }
 }

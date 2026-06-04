@@ -13,19 +13,21 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JSlider;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import controller.SimulatorController;
 import loader.GridLoader;
 import model.Area;
+import model.Guest;
 
 public class SidebarPanel extends JPanel {
+    private SimulationClock simulationClock;
     private final SimulatorController controller;
     private boolean layoutChosen = false;
 
@@ -215,18 +217,61 @@ public class SidebarPanel extends JPanel {
         settingsFrame.setLayout(new FlowLayout());
 
         JLabel label = new JLabel("Simulation speed:");
-        JTextField speedField = new JTextField(10);
+
+        JSlider speedSlider = new JSlider(1, 10, 1);
+
+        speedSlider.setMajorTickSpacing(1);
+
+        speedSlider.setPaintTicks(true);
+
+        speedSlider.setPaintLabels(true);
+
+        JLabel guestLabel = new JLabel("Choose Guest:");
+
+        JComboBox<Guest> guestBox = new JComboBox<>();
+
+        for (Guest guest : controller.getGuests().values()) {
+            guestBox.addItem(guest);
+        }
+        JLabel eventLabel = new JLabel("Choose Event:");
+
+        String[] events = {
+                "Cinema",
+                "Fitness",
+                "Food",
+                "Evacuate"
+        };
+
+        JComboBox<String> eventBox = new JComboBox<>(events);
 
         JButton saveButton = new JButton("Save");
 
         saveButton.addActionListener(e -> {
-            String value = speedField.getText();
-            JOptionPane.showMessageDialog(settingsFrame, "Saved: " + value);
+
+            int value = speedSlider.getValue();
+
+            controller.setHte(1000 / value);
+            simulationClock.setHte(controller.getHte());
+
+            JOptionPane.showMessageDialog(
+                    settingsFrame,
+                    "Saved: " + controller.getHte());
+            Guest selectedGuest = (Guest) guestBox.getSelectedItem();
+
+            String selectedEvent = (String) eventBox.getSelectedItem();
+
+            System.out.println(selectedGuest);
+
+            System.out.println(selectedEvent);
+
+            System.out.println(
+                    selectedGuest + " goes to " + selectedEvent);
+
             settingsFrame.dispose();
         });
 
         settingsFrame.add(label);
-        settingsFrame.add(speedField);
+        settingsFrame.add(speedSlider);
         settingsFrame.add(saveButton);
 
         settingsFrame.setLocationRelativeTo(this);

@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.Timer;
 
 public class SimulationClock extends JLabel{
-    private final int hte;
+    private int hte;
     private int elapsedSimMillis = 0;
     private final Timer simTimer;
 
@@ -37,5 +37,11 @@ public class SimulationClock extends JLabel{
 
     public void stop() {
         simTimer.stop();
+    }
+
+    public void setHte(int hte) {
+        this.hte = hte;
+        simTimer.setDelay(hte);
+        simTimer.setInitialDelay(hte);
     }
 }

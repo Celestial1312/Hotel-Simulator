@@ -1,23 +1,23 @@
-package listener;
+package handler;
 
 import hotelevents.HotelEvent;
 import simulation.Simulation;
 
-public class CheckInEventHandler implements SimulationEventHandler {
+public class CheckOutEventHandler implements SimulationEventHandler{
     private final Simulation simulation;
 
-    public CheckInEventHandler(Simulation simulation) {
+    public CheckOutEventHandler(Simulation simulation) {
         this.simulation = simulation;
     }
 
     @Override
     public boolean canHandle(HotelEvent event) {
-        return event.getEventType().toString().equals("CHECK_IN");
+        return event.getEventType().toString().equalsIgnoreCase("CHECK_OUT");
     }
 
     @Override
     public void handleEvent(HotelEvent event) {
-        simulation.checkIn(event.getGuestId(), event.getData());
+        simulation.checkOut(event.getGuestId());
     }
     
 }

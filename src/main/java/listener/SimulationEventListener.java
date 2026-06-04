@@ -2,6 +2,7 @@ package listener;
 
 import java.util.List;
 
+import handler.SimulationEventHandler;
 import hotelevents.HotelEvent;
 import hotelevents.HotelEventListener;
 
@@ -22,12 +23,7 @@ public class SimulationEventListener implements HotelEventListener {
 
         for (SimulationEventHandler handler : handlers) {
             if (handler.canHandle(hotelEvent)) {
-                try {
-                    handler.handleEvent(hotelEvent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return;
+                handler.handleEvent(hotelEvent);
             }
         }
     }
