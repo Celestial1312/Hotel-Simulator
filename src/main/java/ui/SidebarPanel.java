@@ -46,6 +46,7 @@ public class SidebarPanel extends JPanel {
         JButton chooseLayoutButton = new JButton("Choose Layout");
         JButton startButton = new JButton("Start");
         JButton pauseButton = new JButton("Pause");
+        // JButton stopButton = new JButton("Stop");
         JButton settings = new JButton("Settings");
 
         Dimension size = new Dimension(180, 40);
@@ -54,6 +55,7 @@ public class SidebarPanel extends JPanel {
         chooseLayoutButton.setPreferredSize(size);
         startButton.setPreferredSize(size);
         pauseButton.setPreferredSize(size);
+        // stopButton.setPreferredSize(size);
         settings.setPreferredSize(size);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -90,7 +92,7 @@ public class SidebarPanel extends JPanel {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            controller.startScenario(2);
+            controller.startScenario(4);
             simulationClock.start();
 
             startButton.setEnabled(false);
@@ -272,8 +274,12 @@ public class SidebarPanel extends JPanel {
 
             settingsFrame.dispose();
         });
+       // private void stopButton() {
+        // JFrame settingsFrame = new JFrame("Stop");
 
-        settingsFrame.add(label);
+      //  }
+
+            settingsFrame.add(label);
 
         settingsFrame.add(speedSlider);
 

@@ -11,13 +11,7 @@ import javax.swing.Timer;
 import config.SimulatorSettings;
 import controller.SimulatorController;
 import hotelevents.HotelEventManager;
-import listener.CheckInEventHandler;
-import listener.CheckOutEventHandler;
-import listener.CleaningEmergencyEventHandler;
-import listener.GoToCinemaEventHandler;
-import listener.GoToFitnessEventHandler;
-import listener.NeedFoodEventHandler;
-import listener.SimulationEventListener;
+import listener.*;
 import loader.GridLoader;
 import model.Area;
 import model.Cleaner;
@@ -29,7 +23,6 @@ import model.Tile;
 import pathfinding.AStarPathFinding;
 import ui.SimulationFrame;
 import java.util.Random;
-import java.util.ArrayList;
 
 public class Simulation {
 
@@ -41,6 +34,7 @@ public class Simulation {
 
     private boolean running;
     private boolean paused;
+    private boolean evacuating = false;
 
     private HotelEventManager manager;
     private SimulationEventListener listener;
@@ -64,7 +58,8 @@ public class Simulation {
                 new CleaningEmergencyEventHandler(this),
                 new NeedFoodEventHandler(this),
                 new GoToCinemaEventHandler(this),
-                new GoToFitnessEventHandler(this)
+                new GoToFitnessEventHandler(this),
+                 new evacuateEmergencyEventHandler(this)
             ));
                 
         this.simulationTimer = new Timer(0, null);
@@ -114,6 +109,13 @@ public class Simulation {
 
         simulationTimer.start();
 
+
+        // TIJDELIJK: evacueer alle gasten na 5 seconden om te testen
+        new Timer(20000, e -> evacuateEmergency(-1)) {{
+            setRepeats(false);
+            start();
+        }};
+
         running = true;
         paused = false;
     }
@@ -133,6 +135,7 @@ public class Simulation {
     }
 
     public void checkIn(int guestId, int preferredClassification) {
+        if (evacuating) return;
         SubTile spawnSubTile = grid.getLobbySpawnArea();
 
         Guest guest = new Guest(guestId, spawnSubTile);
@@ -278,6 +281,44 @@ public class Simulation {
         guest.setPath(path);
     }
 
+
+
+    /**
+     * Evacuates ALL guests to the lobby regardless of which guest triggered the event.
+     * The guestId parameter from the event is intentionally ignored here,
+     * because an evacuation affects every guest in the hotel.
+     */
+    public void evacuateEmergency(int guestId) {
+        evacuating = true;
+        // Look up the lobby tile once, before looping — not once per guest
+        Tile lobbyTile = findAreaType("lobby");
+
+        if (lobbyTile == null) {
+            return;
+        }
+
+        for (Guest guest : guests.values()) {
+            // Skip null entries defensively
+            if (guest == null) {
+                continue;
+            }
+
+            SubTile currentSubtile = guest.getCurrentSubTile();
+
+            List<SubTile> path = new AStarPathFinding().findPathToTile(currentSubtile, lobbyTile);
+
+            // If no path exists for this guest, skip them — don't stop the whole evacuation
+            if (path.isEmpty()) {
+                continue;
+            }
+
+            path.remove(0);
+
+            guest.setCheckingOut(true);
+            guest.setTargetTile(lobbyTile);
+            guest.setPath(path);
+        }
+    }
     // public void evacuate(){
 
     // }
