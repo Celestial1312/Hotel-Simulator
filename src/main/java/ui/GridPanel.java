@@ -8,11 +8,13 @@ import model.Area;
 import model.Grid;
 import model.Guest;
 import model.Cleaner;
+import model.Elevator;
 import model.SubTile;
 import model.Tile;
 import simulation.Simulation;
 
 import java.awt.*;
+import java.net.CookieStore;
 
 public class GridPanel extends JPanel {
 
@@ -49,12 +51,12 @@ public class GridPanel extends JPanel {
     public void updateLobbyRectangle() {
         Grid grid = simulation.getGrid();
 
-        if(grid == null) {
+        if (grid == null) {
             return;
         }
 
-        for(int y = 0; y < grid.getSizeY(); y++) {
-            for(int x = 0; x < grid.getSizeX(); x++) {
+        for (int y = 0; y < grid.getSizeY(); y++) {
+            for (int x = 0; x < grid.getSizeX(); x++) {
                 Tile tile = grid.getTile(x, y);
 
                 if (tile == null) {
@@ -63,17 +65,16 @@ public class GridPanel extends JPanel {
 
                 Area area = tile.getArea();
 
-                if(area == null) {
+                if (area == null) {
                     continue;
                 }
-                
-                if(area.getAreaType().equalsIgnoreCase("lobby")) {
+
+                if (area.getAreaType().equalsIgnoreCase("lobby")) {
                     lobbyRectangle.setBounds(
-                        area.getX() * tileSize,
-                        area.getY() * tileSize,
-                        area.getWidth() * tileSize,
-                        area.getHeight() * tileSize
-                    );
+                            area.getX() * tileSize,
+                            area.getY() * tileSize,
+                            area.getWidth() * tileSize,
+                            area.getHeight() * tileSize);
                     return;
                 }
             }
@@ -91,6 +92,7 @@ public class GridPanel extends JPanel {
         }
 
         drawAreas(g, grid);
+        drawElevator(g);
         drawPeople(g, grid);
     }
 
@@ -109,6 +111,29 @@ public class GridPanel extends JPanel {
                 drawAreaName(g, area);
             }
         }
+    }
+
+    public void drawElevator(Graphics g) {
+        Elevator elevator = simulation.getElevator();
+
+        if (elevator == null) {
+            return;
+        }
+
+        Tile liftTile = findLiftTileOnLevel(elevator.getCurrentLevel());
+
+        if (liftTile == null) {
+            return;
+        }
+
+        int x = liftTile.getX() * tileSize;
+        int y = liftTile.getY() * tileSize;
+
+        g.setColor(Color.darkGray);
+        g.fillRect(x + 10, y + 10, tileSize - 20, tileSize - 20);
+
+        g.setColor(Color.WHITE);
+        g.drawRect(x + 16, y + 18, tileSize - 32, tileSize - 32);
     }
 
     public void drawArea(Graphics g, Area area) {
@@ -208,6 +233,28 @@ public class GridPanel extends JPanel {
             case "Room" -> Color.LIGHT_GRAY;
             default -> Color.WHITE;
         };
+    }
+
+    private Tile findLiftTileOnLevel(int level) {
+        Grid grid = simulation.getGrid();
+
+        if (grid == null) {
+            return null;
+        }
+
+        for (int x = 0; x < grid.getSizeX(); x++) {
+            Tile tile = grid.getTile(x, level);
+
+            if (tile == null || tile.getArea() == null) {
+                continue;
+            }
+
+            if (tile.getArea().getAreaType().equalsIgnoreCase("lift")) {
+                return tile;
+            }
+        }
+
+        return null;
     }
 
     public Rectangle getLobbyRectangle() {

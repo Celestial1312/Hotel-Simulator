@@ -17,6 +17,12 @@ public class AStarPathFinding {
             return Collections.emptyList();
         }
 
+        int allowedLevel = start.getParentTile().getY();
+
+        if(target.getParentTile().getY() != allowedLevel) {
+            return Collections.emptyList();
+        }
+
         PriorityQueue<Node> openSet = new PriorityQueue<>();
         Map<SubTile, SubTile> cameFrom = new HashMap<>();
         Map<SubTile, Integer> gScores = new HashMap<>();
@@ -34,6 +40,10 @@ public class AStarPathFinding {
             int currentGScore = gScores.getOrDefault(current, Integer.MAX_VALUE);
 
             for (SubTile neighbor : getNeighbors(current)) {
+                if(neighbor.getParentTile().getY() != allowedLevel) {
+                    continue;
+                }
+
                 if (!isWalkable(neighbor, target)) {
                     continue;
                 }

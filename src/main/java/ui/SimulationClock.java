@@ -6,7 +6,7 @@ import java.awt.Font;
 import javax.swing.JLabel;
 import javax.swing.Timer;
 
-public class SimulationClock extends JLabel{
+public class SimulationClock extends JLabel {
     private int hte;
     private int elapsedSimMillis = 0;
     private final Timer simTimer;
@@ -17,7 +17,7 @@ public class SimulationClock extends JLabel{
         setText("Simulation Time: 00:00:00.000");
         setFont(new Font("Arial", Font.BOLD, 20));
         setForeground(Color.BLUE);
-        
+
         simTimer = new Timer(this.hte, e -> {
             elapsedSimMillis += this.hte;
 
@@ -37,6 +37,12 @@ public class SimulationClock extends JLabel{
 
     public void stop() {
         simTimer.stop();
+    }
+
+    public void reset() {
+        simTimer.stop();
+        elapsedSimMillis = 0;
+        setText("Simulation Time: 00:00:00.000");
     }
 
     public void setHte(int hte) {

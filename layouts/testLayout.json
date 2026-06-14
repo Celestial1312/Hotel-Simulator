@@ -6,13 +6,13 @@
 	},
 	{
 		"AreaType": "Lift",
-		"Position": "0, 3",
-		"Dimension": "1, 8"
+		"Position": "0, 0",
+		"Dimension": "1, 9"
 	},
 	{
 		"AreaType": "Stairs",
-		"Position": "7, 3",
-		"Dimension": "1, 8"
+		"Position": "7, 0",
+		"Dimension": "1, 9"
 	},
 	{
 		"AreaType": "Cinema",

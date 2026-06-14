@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import model.Guest;
 import simulation.Simulation;
+import ui.SimulationFrame;
 
 public class SimulatorController {
     private final Simulation simulation;
@@ -23,6 +24,10 @@ public class SimulatorController {
 
     public void togglePauseScenario() {
         simulation.togglePauseScenario();
+    }
+
+    public void stopScenario() {
+        simulation.stopScenario();
     }
 
     public boolean isPaused() {

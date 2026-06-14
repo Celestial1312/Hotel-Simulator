@@ -1,9 +1,17 @@
 package handler;
 
+import java.util.List;
+
 import hotelevents.HotelEvent;
+import model.Guest;
+import model.SubTile;
+import model.Tile;
+import model.Person.PersonGoal;
+import model.Person.PersonState;
+import pathfinding.AStarPathFinding;
 import simulation.Simulation;
 
-public class CheckOutEventHandler implements SimulationEventHandler{
+public class CheckOutEventHandler implements SimulationEventHandler {
     private final Simulation simulation;
 
     public CheckOutEventHandler(Simulation simulation) {
@@ -17,7 +25,55 @@ public class CheckOutEventHandler implements SimulationEventHandler{
 
     @Override
     public void handleEvent(HotelEvent event) {
-        simulation.checkOut(event.getGuestId());
+        Guest guest = simulation.getGuests().get(event.getGuestId());
+
+        if (guest == null) {
+            return;
+        }
+
+        SubTile startSubtile = guest.getCurrentSubTile();
+
+        Tile lobbyTile = simulation.findAreaType("lobby");
+
+        if(lobbyTile == null) {
+            return;
+        }
+
+        Tile liftTile = simulation.findElevatorTileOnSameLevel(startSubtile);
+        Tile stairTile = simulation.findStairTileOnSameLevel(startSubtile);
+
+        if (liftTile == null && stairTile == null) {
+            return;
+        }
+
+        AStarPathFinding aStarPathFinding = new AStarPathFinding();
+
+        List<SubTile> pathToLift = aStarPathFinding.findPathToTile(startSubtile, liftTile);
+        List<SubTile> pathToStairs = aStarPathFinding.findPathToTile(startSubtile, stairTile);
+
+        if (pathToLift.isEmpty() && pathToStairs.isEmpty()) {
+            return;
+        }
+
+        if (pathToLift.isEmpty() || (!pathToStairs.isEmpty() && pathToLift.size() > pathToStairs.size())) {
+            pathToStairs.remove(0);
+            if (!pathToStairs.isEmpty()) {
+                pathToStairs.remove(pathToStairs.size() - 1);
+            }
+            guest.setPath(pathToStairs);
+            guest.setPersonState(PersonState.WALKING_TO_STAIRS);
+        } else {
+            pathToLift.remove(0);
+            if (!pathToLift.isEmpty()) {
+                pathToLift.remove(pathToLift.size() - 1);
+            }
+            guest.setPath(pathToLift);
+            guest.setPersonState(PersonState.WALKING_TO_LIFT);
+        }
+
+        guest.setCheckingOut(true);
+        guest.setTargetTile(lobbyTile);
+        guest.setPersonGoal(PersonGoal.CHECKOUT);
     }
-    
+
 }

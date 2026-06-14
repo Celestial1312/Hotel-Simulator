@@ -28,6 +28,7 @@ import model.Guest;
 
 public class SidebarPanel extends JPanel {
     private SimulationClock simulationClock;
+    private RealTimeClock realTimeClock;
     private final SimulatorController controller;
     private boolean layoutChosen = false;
 
@@ -38,13 +39,14 @@ public class SidebarPanel extends JPanel {
         setBackground(Color.GRAY);
         setLayout(new GridBagLayout());
 
-        SimulationClock simulationClock = new SimulationClock(controller.getHte());
-        RealTimeClock realTimeClock = new RealTimeClock();
+        simulationClock = new SimulationClock(controller.getHte());
+        realTimeClock = new RealTimeClock();
 
         JButton uploadButton = new JButton("Upload JSON");
         JButton chooseLayoutButton = new JButton("Choose Layout");
         JButton startButton = new JButton("Start");
         JButton pauseButton = new JButton("Pause");
+        JButton stopButton = new JButton("Stop");
         JButton settings = new JButton("Settings");
 
         Dimension size = new Dimension(180, 40);
@@ -53,6 +55,7 @@ public class SidebarPanel extends JPanel {
         chooseLayoutButton.setPreferredSize(size);
         startButton.setPreferredSize(size);
         pauseButton.setPreferredSize(size);
+        stopButton.setPreferredSize(size);
         settings.setPreferredSize(size);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -78,6 +81,9 @@ public class SidebarPanel extends JPanel {
         add(pauseButton, gbc);
 
         gbc.gridy = 6;
+        add(stopButton, gbc);
+
+        gbc.gridy = 7;
         add(settings, gbc);
 
         uploadButton.addActionListener(e -> uploadJson());
@@ -94,6 +100,7 @@ public class SidebarPanel extends JPanel {
 
             startButton.setEnabled(false);
             pauseButton.setEnabled(true);
+            stopButton.setEnabled(true);
             pauseButton.setText("Pause");
         });
 
@@ -111,6 +118,27 @@ public class SidebarPanel extends JPanel {
                 simulationClock.start();
                 pauseButton.setText("Pause");
             }
+
+            startButton.setEnabled(false);
+        });
+
+        stopButton.addActionListener(e -> {
+            if (!layoutChosen) {
+                JOptionPane.showMessageDialog(this, "Please choose a layout first!", "No Layout Chosen",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            controller.stopScenario();
+            simulationClock.reset();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "The simulation has been stopped.",
+                    "Simulation Stopped",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            startButton.setEnabled(true);
+            pauseButton.setEnabled(false);
+            stopButton.setEnabled(false);
         });
 
         settings.addActionListener(e -> openSettings());
@@ -226,23 +254,6 @@ public class SidebarPanel extends JPanel {
 
         speedSlider.setPaintLabels(true);
 
-        JLabel guestLabel = new JLabel("Choose Guest:");
-
-        JComboBox<Guest> guestBox = new JComboBox<>();
-
-        for (Guest guest : controller.getGuests().values()) {
-            guestBox.addItem(guest);
-        }
-        JLabel eventLabel = new JLabel("Choose Event:");
-
-        String[] events = {
-                "Cinema",
-                "Fitness",
-                "Food",
-                "Evacuate"
-        };
-
-        JComboBox<String> eventBox = new JComboBox<>(events);
 
         JButton saveButton = new JButton("Save");
 
@@ -252,21 +263,7 @@ public class SidebarPanel extends JPanel {
 
             controller.setHte(1000 / value);
             simulationClock.setHte(controller.getHte());
-
-            JOptionPane.showMessageDialog(
-                    settingsFrame,
-                    "Saved: " + controller.getHte());
-            Guest selectedGuest = (Guest) guestBox.getSelectedItem();
-
-            String selectedEvent = (String) eventBox.getSelectedItem();
-
-            System.out.println(selectedGuest);
-
-            System.out.println(selectedEvent);
-
-            System.out.println(
-                    selectedGuest + " goes to " + selectedEvent);
-
+            
             settingsFrame.dispose();
         });
 
