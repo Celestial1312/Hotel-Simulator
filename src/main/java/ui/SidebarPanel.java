@@ -18,7 +18,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import controller.SimulatorController;
@@ -26,7 +25,6 @@ import loader.GridLoader;
 import model.Area;
 import javax.swing.JSlider;
 import javax.swing.JComboBox;
-import model.Guest;
 
 public class SidebarPanel extends JPanel {
     private final SimulatorController controller;
@@ -224,6 +222,7 @@ public class SidebarPanel extends JPanel {
 
         JLabel label = new JLabel("Simulation speed:");
 
+        // Slider: 1 = traag (1000ms per tick), 10 = snel (100ms per tick)
         JSlider speedSlider = new JSlider(1, 10, 5);
 
         speedSlider.setMajorTickSpacing(1);
@@ -232,13 +231,6 @@ public class SidebarPanel extends JPanel {
 
         speedSlider.setPaintLabels(true);
 
-        JLabel guestLabel = new JLabel("Choose Guest:");
-
-        JComboBox<Guest> guestBox = new JComboBox<>();
-
-        for (Guest guest : controller.getGuests().values()) {
-            guestBox.addItem(guest);
-        }
         JLabel eventLabel = new JLabel("Choose Event:");
 
         String[] events = {
@@ -256,35 +248,34 @@ public class SidebarPanel extends JPanel {
 
             int value = speedSlider.getValue();
 
-            controller.setHte(value * 100);
+            // Sterrensysteem-achtige mapping voor snelheid:
+            // value=10 -> hte=100  (snelst)
+            // value=1  -> hte=1000 (traagst)
+            int hte = 1100 - (value * 100);
 
-            JOptionPane.showMessageDialog(
-                    settingsFrame,
-                    "Saved: " + value);
-            Guest selectedGuest = (Guest) guestBox.getSelectedItem();
+            controller.setHte(hte);
 
             String selectedEvent = (String) eventBox.getSelectedItem();
 
-            System.out.println(selectedGuest);
+            if (selectedEvent != null) {
+                switch (selectedEvent) {
+                    case "Cinema" -> controller.goToCinema();
+                    case "Fitness" -> controller.goToFitness();
+                    case "Food" -> controller.needFood();
+                    case "Evacuate" -> controller.evacuate();
+                }
+            }
 
-            System.out.println(selectedEvent);
-
-            System.out.println(
-                    selectedGuest + " goes to " + selectedEvent);
+            JOptionPane.showMessageDialog(
+                    settingsFrame,
+                    "Saved: HTE = " + hte + "ms");
 
             settingsFrame.dispose();
         });
-       // private void stopButton() {
-        // JFrame settingsFrame = new JFrame("Stop");
 
-      //  }
-
-            settingsFrame.add(label);
+        settingsFrame.add(label);
 
         settingsFrame.add(speedSlider);
-
-        settingsFrame.add(guestLabel);
-        settingsFrame.add(guestBox);
 
         settingsFrame.add(eventLabel);
         settingsFrame.add(eventBox);

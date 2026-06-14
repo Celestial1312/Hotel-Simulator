@@ -1,6 +1,6 @@
 package config;
 
-// Deze class bevat instellingen van de simulator
+// Deze class bevat instellingen van de simulator sr
 public class SimulatorSettings {
 
     // HTE = Hotel Time Event snelheid
@@ -10,11 +10,11 @@ public class SimulatorSettings {
     // Constructor
     public SimulatorSettings() {
 
-        // Standaard snelheid instellen op 1000 milliseconden
-        this.hte = 1000;
+        // Standaard snelheid instellen op 1000 milliseconden co /و
+        this.hte = 100; // co
     }
 
-    // Geeft huidige HTE terug
+    // Geeft huidige HTE terug / كابسو
     public int getHte() {
         return hte;
     }
