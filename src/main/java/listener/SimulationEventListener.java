@@ -1,22 +1,29 @@
 package listener;
 
+import java.util.List;
+
+import handler.SimulationEventHandler;
 import hotelevents.HotelEvent;
 import hotelevents.HotelEventListener;
-import simulation.Simulation;
 
 public class SimulationEventListener implements HotelEventListener {
-    private final Simulation simulation;
+    private final List<SimulationEventHandler> handlers;
 
-    public SimulationEventListener(Simulation simulation) {
-        this.simulation = simulation;
+    public SimulationEventListener(List<SimulationEventHandler> handlers) {
+        this.handlers = handlers;
     }
+
     @Override
     public void notify(HotelEvent hotelEvent) {
-        System.out.println("event ontvangen " +  hotelEvent.getEventType());
+        System.out.println("event ontvangen "
+                + "time=" + hotelEvent.getTime() + " "
+                + "type=" + hotelEvent.getEventType() + " "
+                + "data=" + hotelEvent.getData() + " "
+                + "guestId=" + hotelEvent.getGuestId());
 
-        switch(hotelEvent.getEventType()) {
-            case CHECK_IN -> simulation.handleCheckIn(hotelEvent.getGuestId());
-            default -> {
+        for (SimulationEventHandler handler : handlers) {
+            if (handler.canHandle(hotelEvent)) {
+                handler.handleEvent(hotelEvent);
             }
         }
     }

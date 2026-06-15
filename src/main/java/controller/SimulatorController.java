@@ -1,8 +1,11 @@
 package controller;
 
 import java.io.File;
+import java.util.HashMap;
 
+import model.Guest;
 import simulation.Simulation;
+import ui.SimulationFrame;
 
 public class SimulatorController {
     private final Simulation simulation;
@@ -19,16 +22,28 @@ public class SimulatorController {
         simulation.startScenario(scenarioId);
     }
 
-    public void pauseScenario() {
-        simulation.pauseScenario();
+    public void togglePauseScenario() {
+        simulation.togglePauseScenario();
     }
 
+    public void stopScenario() {
+        simulation.stopScenario();
+    }
+
+    public boolean isPaused() {
+        return simulation.isPaused();
+    }
+    
     public int getHte() {
         return simulation.getSettings().getHte();
     }
 
     public void setHte(int hte) {
         simulation.getSettings().setHte(hte);
+        simulation.refreshHte();
+    }
+    
+    public HashMap<Integer, Guest> getGuests() {
+        return simulation.getGuests();
     }
 }
-

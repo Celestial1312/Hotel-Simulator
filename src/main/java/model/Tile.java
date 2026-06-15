@@ -1,11 +1,14 @@
 package model;
 
+import java.util.List;
+
 public class Tile {
 
     private int x;
     private int y;
     private Area area;
     private final SubTile[][] subTiles;
+    private List<SubTile> listOfSubTiles;
 
     private Tile up;
     private Tile down;
@@ -38,7 +41,7 @@ public class Tile {
                     current.setUp(subTiles[y-1][x]);
                 }
 
-                if(y > subTiles.length - 1) {
+                if(y < subTiles.length - 1) {
                     current.setDown(subTiles[y+1][x]);
                 }
 
@@ -46,7 +49,7 @@ public class Tile {
                     current.setLeft(subTiles[y][x-1]);
                 }
 
-                if(x > subTiles[y].length - 1) {
+                if(x < subTiles[y].length - 1) {
                     current.setRight(subTiles[y][x+1]);
                 }
             }
@@ -103,5 +106,25 @@ public class Tile {
 
     public SubTile[][] getSubTiles() {
         return subTiles;
+    }
+
+    public List<SubTile> getListOfSubTiles() {
+        return listOfSubTiles;
+    }
+
+    public SubTile getSubTile(int x, int y) {
+        if (y < 0 || y >= subTiles.length || x < 0 || x >= subTiles[y].length) {
+            return null;
+        }
+
+        return subTiles[y][x];
+    }
+
+    public int getSubTileRows() {
+        return subTiles.length;
+    }
+
+    public int getSubTileColumns() {
+        return subTiles[0].length;
     }
 }
