@@ -13,7 +13,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +23,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import controller.SimulatorController;
 import loader.GridLoader;
 import model.Area;
-import model.Guest;
 
 public class SidebarPanel extends JPanel {
     private SimulationClock simulationClock;
@@ -95,7 +93,7 @@ public class SidebarPanel extends JPanel {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            controller.startScenario(2);
+            controller.startScenario(4);
             simulationClock.start();
 
             startButton.setEnabled(false);
@@ -240,8 +238,11 @@ public class SidebarPanel extends JPanel {
     }
 
     private void openSettings() {
+
         JFrame settingsFrame = new JFrame("Instellingen");
+
         settingsFrame.setSize(300, 200);
+
         settingsFrame.setLayout(new FlowLayout());
 
         JLabel label = new JLabel("Simulation speed:");
@@ -272,6 +273,7 @@ public class SidebarPanel extends JPanel {
         settingsFrame.add(saveButton);
 
         settingsFrame.setLocationRelativeTo(this);
+
         settingsFrame.setVisible(true);
     }
 }

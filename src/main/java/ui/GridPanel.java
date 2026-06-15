@@ -1,6 +1,5 @@
 package ui;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import handler.GridMouseEventHandler;
@@ -14,7 +13,6 @@ import model.Tile;
 import simulation.Simulation;
 
 import java.awt.*;
-import java.net.CookieStore;
 
 public class GridPanel extends JPanel {
 
@@ -99,6 +97,7 @@ public class GridPanel extends JPanel {
     public void drawAreas(Graphics g, Grid grid) {
         for (int y = 0; y < grid.getSizeY(); y++) {
             for (int x = 0; x < grid.getSizeX(); x++) {
+
                 Tile tile = grid.getTile(x, y);
 
                 if (tile == null || tile.getArea() == null) {
@@ -106,6 +105,10 @@ public class GridPanel extends JPanel {
                 }
 
                 Area area = tile.getArea();
+
+                if (x != area.getX() || y != area.getY()) {
+                    continue;
+                }
 
                 drawArea(g, area);
                 drawAreaName(g, area);
@@ -166,6 +169,11 @@ public class GridPanel extends JPanel {
 
         String text = area.getAreaType();
 
+        if ("Room".equalsIgnoreCase(area.getAreaType())) {
+            text += " " + "★".repeat(
+                    Math.max(area.getClassification(), 0));
+        }
+
         g.setColor(Color.BLACK);
         g.setFont(getFont());
 
@@ -174,6 +182,7 @@ public class GridPanel extends JPanel {
         int textX = x + (width - fm.stringWidth(text)) / 2;
         int textY = y + (height - fm.getHeight()) / 2 + fm.getAscent();
 
+        g.setColor(getForeground());
         g.drawString(text, textX, textY);
     }
 

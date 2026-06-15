@@ -18,6 +18,7 @@ import handler.GoToFitnessEventHandler;
 import handler.MovementHandler;
 import handler.NeedFoodEventHandler;
 import handler.StairHandler;
+import handler.EvacuateEmergencyEventHandler;
 import hotelevents.HotelEventManager;
 import listener.SimulationEventListener;
 import loader.GridLoader;
@@ -30,6 +31,7 @@ import model.Stair;
 import model.SubTile;
 import model.Tile;
 import ui.SimulationFrame;
+import java.util.Random;
 
 public class Simulation {
 
@@ -74,7 +76,8 @@ public class Simulation {
                 new CleaningEmergencyEventHandler(this),
                 new NeedFoodEventHandler(this),
                 new GoToCinemaEventHandler(this),
-                new GoToFitnessEventHandler(this)));
+                new GoToFitnessEventHandler(this),
+                new EvacuateEmergencyEventHandler(this)));
 
         this.simulationTimer = new Timer(0, null);
         this.running = false;
