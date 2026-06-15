@@ -1,7 +1,6 @@
 package model;
 
 public class Guest extends Person {
-    private Area room;
 
     private boolean isCheckingOut;
 

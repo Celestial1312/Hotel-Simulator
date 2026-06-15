@@ -1,6 +1,7 @@
 package model;
 
 public class Cleaner extends Person {
+
     private int cleaningTicks;
 
     public Cleaner(int id, SubTile startTile) {

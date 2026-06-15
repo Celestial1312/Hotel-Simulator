@@ -6,15 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Area {
 
+    public enum AreaState {
+        AVAILABLE,
+        OCCUPIED,
+        NEEDS_CLEANING,
+        BEING_CLEANED
+    }
+
     private int x;
     private int y;
     private int width;
     private int height;
     private int classification;
-    private boolean isClaimed = false;
 
     private Guest guest;
     private Tile tile;
+    private AreaState state = AreaState.AVAILABLE;
 
     public Area() {
 
@@ -48,10 +55,6 @@ public class Area {
         return height;
     }
 
-    public boolean getIsClaimed() {
-        return isClaimed;
-    }
-
     public Guest getGuest() {
         return guest;
     }
@@ -60,8 +63,12 @@ public class Area {
         return tile;
     }
 
-    public boolean setIsClaimed(boolean isClaimed) {
-        return this.isClaimed = isClaimed;
+    public AreaState getState() {
+        return state;
+    }
+
+    public void setState(AreaState state) {
+        this.state = state;
     }
 
     public Guest setGuest(Guest guest) {
@@ -76,7 +83,7 @@ public class Area {
 
     @JsonProperty("Classification")
     public void setClassification(String classification) {
-        String [] parts = classification.split(" ");
+        String[] parts = classification.split(" ");
         this.classification = Integer.parseInt(parts[0].trim());
     }
 

@@ -4,23 +4,32 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.Timer;
 
 import config.SimulatorSettings;
 import controller.SimulatorController;
+import handler.CheckInEventHandler;
+import handler.CheckOutEventHandler;
+import handler.CleaningEmergencyEventHandler;
+import handler.ElevatorHandler;
+import handler.GoToCinemaEventHandler;
+import handler.GoToFitnessEventHandler;
+import handler.MovementHandler;
+import handler.NeedFoodEventHandler;
+import handler.StairHandler;
+import handler.EvacuateEmergencyEventHandler;
 import hotelevents.HotelEventManager;
-import listener.*;
+import listener.SimulationEventListener;
 import loader.GridLoader;
 import model.Area;
 import model.Cleaner;
+import model.Elevator;
 import model.Grid;
 import model.Guest;
-import model.Person;
+import model.Stair;
 import model.SubTile;
 import model.Tile;
-import pathfinding.AStarPathFinding;
 import ui.SimulationFrame;
 import java.util.Random;
 
@@ -31,10 +40,16 @@ public class Simulation {
     private SimulatorController controller;
     private GridLoader gridLoader;
     private SimulationFrame frame;
+    private Elevator elevator;
+    private Stair stair;
+    private File currentLayoutFile;
+
+    private ElevatorHandler elevatorHandler;
+    private StairHandler stairHandler;
+    private MovementHandler movementHandler;
 
     private boolean running;
     private boolean paused;
-    private boolean evacuating = false;
 
     private HotelEventManager manager;
     private SimulationEventListener listener;
@@ -45,12 +60,15 @@ public class Simulation {
 
     private Timer simulationTimer;
 
-    private final Random random = new Random();
-
     public Simulation() {
         this.settings = new SimulatorSettings();
         this.controller = new SimulatorController(this);
         this.gridLoader = new GridLoader();
+        this.elevator = new Elevator(0);
+        this.stair = new Stair();
+        this.elevatorHandler = new ElevatorHandler(this, elevator);
+        this.stairHandler = new StairHandler(this, stair);
+        this.movementHandler = new MovementHandler(this, elevatorHandler, stairHandler);
         this.manager = new HotelEventManager();
         this.listener = new SimulationEventListener(List.of(
                 new CheckInEventHandler(this),
@@ -59,9 +77,8 @@ public class Simulation {
                 new NeedFoodEventHandler(this),
                 new GoToCinemaEventHandler(this),
                 new GoToFitnessEventHandler(this),
-                 new evacuateEmergencyEventHandler(this)
-            ));
-                
+                new EvacuateEmergencyEventHandler(this)));
+
         this.simulationTimer = new Timer(0, null);
         this.running = false;
         this.paused = false;
@@ -90,8 +107,25 @@ public class Simulation {
     public SimulationFrame getFrame() {
         return frame;
     }
+
     public HashMap<Integer, Guest> getGuests() {
         return guests;
+    }
+
+    public HashMap<Integer, Cleaner> getCleaners() {
+        return cleaners;
+    }
+
+    public List<Area> getRooms() {
+        return rooms;
+    }
+
+    public Elevator getElevator() {
+        return elevator;
+    }
+
+    public Stair getStair() {
+        return stair;
     }
 
     public void startApplication() {
@@ -100,21 +134,22 @@ public class Simulation {
     }
 
     public void startScenario(int scenarioId) {
+        if (running) {
+            return;
+        }
+
         manager.setHte(settings.getHte());
         manager.start(scenarioId);
 
         simulationTimer = new Timer(settings.getHte(), e -> {
-            movePeopleOneStep();
+            movementHandler.movePeopleOneStep();
+
+            if (frame != null) {
+                frame.refreshGrid();
+            }
         });
 
         simulationTimer.start();
-
-
-        // TIJDELIJK: evacueer alle gasten na 5 seconden om te testen
-        new Timer(20000, e -> evacuateEmergency(-1)) {{
-            setRepeats(false);
-            start();
-        }};
 
         running = true;
         paused = false;
@@ -134,209 +169,42 @@ public class Simulation {
         }
     }
 
-    public void checkIn(int guestId, int preferredClassification) {
-        if (evacuating) return;
-        SubTile spawnSubTile = grid.getLobbySpawnArea();
-
-        Guest guest = new Guest(guestId, spawnSubTile);
-
-        spawnSubTile.setPerson(guest);
-        guests.put(guestId, guest);
-
-        Area room = findAvailableRoom(preferredClassification);
-
-        if (room == null) {
-            return;
-        }
-        Tile roomTile = grid.getTile(room.getX(), room.getY());
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(spawnSubTile, roomTile);
-
-        if (path.isEmpty()) {
+    public void stopScenario() {
+        if (!running && !paused) {
             return;
         }
 
-        path.remove(0);
+        simulationTimer.stop();
 
-        room.setGuest(guest);
-        guest.setTargetTile(roomTile);
-        guest.setPath(path);
-    }
+        manager.stop();
 
-    public void checkOut(int guestId) {
-        Guest guest = guests.get(guestId);
+        guests.clear();
+        cleaners.clear();
+        elevator.getPassengers().clear();
+        elevator.getWaitingPeople().clear();
+        stair.getPeople().clear();
 
-        if (guest == null) {
-            return;
-        }
+        running = false;
+        paused = false;
 
-        SubTile currentSubtile = guest.getCurrentSubTile();
-
-        Tile lobbyTile = findAreaType("lobby");
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(currentSubtile, lobbyTile);
-
-        if (path.isEmpty()) {
-            return;
-        }
-
-        path.remove(0);
-
-        guest.setCheckingOut(true);
-        guest.setTargetTile(lobbyTile);
-        guest.setPath(path);
-    }
-
-    public void cleaningEmergency(int guestId) {
-        Area guestRoom = findGuestRoom(guestId);
-
-        if (guestRoom == null) {
-            return;
-        }
-
-        SubTile spawnSubTile = grid.getLobbySpawnArea();
-
-        Tile guestRoomTile = grid.getTile(guestRoom.getX(), guestRoom.getY());
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(spawnSubTile, guestRoomTile);
-
-        if (path.isEmpty()) {
-            return;
-        }
-
-        Cleaner cleaner = new Cleaner(guestId, spawnSubTile);
-
-        cleaners.put(guestId, cleaner);
-        spawnSubTile.setPerson(cleaner);
-
-        path.remove(0);
-        cleaner.setTargetTile(guestRoomTile);
-        cleaner.setPath(path);
-    }
-
-    public void goToCinema(int guestId) {
-        Guest guest = guests.get(guestId);
-
-        if (guest == null) {
-            return;
-        }
-
-        SubTile startSubTile = guest.getCurrentSubTile();
-
-        Tile cinemaTile = findAreaType("cinema");
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(startSubTile, cinemaTile);
-
-        if (path.isEmpty()) {
-            return;
-        }
-
-        path.remove(0);
-
-        guest.setTargetTile(cinemaTile);
-        guest.setPath(path);
-    }
-
-    public void needFood(int guestId) {
-        Guest guest = guests.get(guestId);
-
-        if(guest == null){ 
-            return;
-        }
-
-        SubTile currentSubTile = guest.getCurrentSubTile();
-
-        Tile restaurantTile = findAreaType("restaurant");
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(currentSubTile, restaurantTile);
-
-        if(path.isEmpty()) {
-            return;
-        }
-
-        path.remove(0);
-        guest.setTargetTile(restaurantTile);
-        guest.setPath(path);
-    }
-
-    public void goToFitness(int guestId) {
-        Guest guest = guests.get(guestId);
-
-        if(guest == null) {
-            return;
-        }
-
-        SubTile currenSubTile = guest.getCurrentSubTile();
-
-        Tile fitnessTile = findAreaType("fitness");
-
-        List<SubTile> path = new AStarPathFinding().findPathToTile(currenSubTile, fitnessTile);
-
-        if(path.isEmpty()) {
-            return;
-        }
-
-        path.remove(0);
-        guest.setTargetTile(fitnessTile);
-        guest.setPath(path);
-    }
-
-
-
-    /**
-     * Evacuates ALL guests to the lobby regardless of which guest triggered the event.
-     * The guestId parameter from the event is intentionally ignored here,
-     * because an evacuation affects every guest in the hotel.
-     */
-    public void evacuateEmergency(int guestId) {
-        evacuating = true;
-        // Look up the lobby tile once, before looping — not once per guest
-        Tile lobbyTile = findAreaType("lobby");
-
-        if (lobbyTile == null) {
-            return;
-        }
-
-        for (Guest guest : guests.values()) {
-            // Skip null entries defensively
-            if (guest == null) {
-                continue;
-            }
-
-            SubTile currentSubtile = guest.getCurrentSubTile();
-
-            List<SubTile> path = new AStarPathFinding().findPathToTile(currentSubtile, lobbyTile);
-
-            // If no path exists for this guest, skip them — don't stop the whole evacuation
-            if (path.isEmpty()) {
-                continue;
-            }
-
-            path.remove(0);
-
-            guest.setCheckingOut(true);
-            guest.setTargetTile(lobbyTile);
-            guest.setPath(path);
+        if (currentLayoutFile != null) {
+            loadGridFromJsonFile(currentLayoutFile);
         }
     }
-    // public void evacuate(){
-
-    // }
-
-    // public void godzilla(){
-
-    // }
-
-    // public void startCinema(){
-
-    // }
 
     public void loadGridFromJsonFile(File file) {
+        if (file == null) {
+            return;
+        }
+
+        currentLayoutFile = file;
+
         try {
             List<Area> areas = gridLoader.loadAreasFromFile(file);
 
             this.grid = gridLoader.loadGridFromAreas(areas);
             this.rooms = gridLoader.getListOfRooms(areas);
+            this.elevator.setCurrentLevel(grid.getSizeY() - 1);
 
             if (frame != null) {
                 frame.refreshGrid();
@@ -346,7 +214,7 @@ public class Simulation {
         }
     }
 
-    private Tile findAreaType(String areaType) {
+    public Tile findAreaType(String areaType) {
         for (int y = 0; y < grid.getSizeY(); y++) {
             for (int x = 0; x < grid.getSizeX(); x++) {
                 Tile tile = grid.getTile(x, y);
@@ -364,7 +232,7 @@ public class Simulation {
         return null;
     }
 
-    private Area findGuestRoom(int guestId) {
+    public Area findGuestRoom(int guestId) {
         for (Area room : rooms) {
             Guest guest = room.getGuest();
 
@@ -380,84 +248,46 @@ public class Simulation {
         return null;
     }
 
-    private void movePeopleOneStep() {
-        for (Iterator<Guest> iterator = guests.values().iterator(); iterator.hasNext();) {
-            Guest guest = iterator.next();
+    public Tile findElevatorTileOnSameLevel(SubTile subTile) {
+        int guestY = subTile.getParentTile().getY();
 
-            movePersonOneStep(guest);
+        for (int x = 0; x < grid.getSizeX(); x++) {
+            Tile tile = grid.getTile(x, guestY);
 
-            if (guest.isCheckingOut() && isInLobby(guest)) {
-                Area guestRoom = findGuestRoom(guest.getId());
-
-                if (guestRoom != null) {
-                    guestRoom.setGuest(null);
-                    guestRoom.setIsClaimed(false);
-                }
-
-                guest.getCurrentSubTile().setPerson(null);
-                iterator.remove();
-            }
-        }
-
-        for (Iterator<Cleaner> iterator = cleaners.values().iterator(); iterator.hasNext();) {
-            Cleaner cleaner = iterator.next();
-
-            if (cleaner.isCleaning()) {
-                cleaner.decreaseCleaningTicks();
-
-                if (!cleaner.isCleaning()) {
-                    cleaner.getCurrentSubTile().setPerson(null);
-                    iterator.remove();
-                }
-
+            if (tile == null || tile.getArea() == null) {
                 continue;
             }
 
-            movePersonOneStep(cleaner);
-
-            if (!cleaner.hasPath()) {
-                cleaner.startCleaning(5);
+            if (tile.getArea().getAreaType().equalsIgnoreCase("lift")) {
+                return tile;
             }
         }
-
-        frame.refreshGrid();
-    }
-
-    private void movePersonOneStep(Person person) {
-        SubTile current = person.getCurrentSubTile();
-        SubTile next = person.getNextStep();
-
-        if (next == null) {
-            return;
-        }
-
-        current.setPerson(null);
-        next.setPerson(person);
-        person.setCurrentSubTile(next);
-    }
-
-    private boolean isInLobby(Person person) {
-        Area area = person.getCurrentSubTile()
-                .getParentTile()
-                .getArea();
-
-        return area != null && area.getAreaType().equalsIgnoreCase("lobby");
-    }
-
-    private Area findAvailableRoom(int preferredClassification) {
-        for (Area room : rooms) {
-            if (room.getIsClaimed()) {
-                continue;
-            }
-
-            if (preferredClassification != room.getClassification()) {
-                continue;
-            }
-
-            room.setIsClaimed(true);
-            return room;
-        }
-
         return null;
+    }
+
+    public Tile findStairTileOnSameLevel(SubTile subTile) {
+        int guestY = subTile.getParentTile().getY();
+
+        for (int x = 0; x < grid.getSizeX(); x++) {
+            Tile tile = grid.getTile(x, guestY);
+
+            if (tile == null || tile.getArea() == null) {
+                continue;
+            }
+
+            if (tile.getArea().getAreaType().equalsIgnoreCase("stairs")) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public void refreshHte() {
+        int hte = settings.getHte();
+
+        manager.setHte(hte);
+
+        simulationTimer.setDelay(hte);
+        simulationTimer.setInitialDelay(hte);
     }
 }
