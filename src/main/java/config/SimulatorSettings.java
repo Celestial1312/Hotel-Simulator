@@ -2,21 +2,27 @@ package config;
 
 public class SimulatorSettings {
 
-    // HTE = Hotel Time Event snelheid
-    // Dit bepaalt hoe snel de simulatie loopt
     private int hte;
+    private int scenarioId;
 
     public SimulatorSettings() {
-        this.hte = 500;
+        this.hte = 1000;
+        this.scenarioId = 1;
     }
 
-    // Geeft huidige HTE terug
     public int getHte() {
         return hte;
     }
 
-    // Verandert de snelheid van de simulatie
     public void setHte(int hte) {
         this.hte = hte;
+    }
+
+    public int getScenarioId() {
+        return scenarioId;
+    }
+
+    public void setScenarioId(int scenarioId) {
+        this.scenarioId = scenarioId;
     }
 }

@@ -31,7 +31,6 @@ import model.Stair;
 import model.SubTile;
 import model.Tile;
 import ui.SimulationFrame;
-import java.util.Random;
 
 public class Simulation {
 
@@ -78,7 +77,6 @@ public class Simulation {
                 new GoToCinemaEventHandler(this),
                 new GoToFitnessEventHandler(this),
                 new EvacuateEmergencyEventHandler(this)));
-
         this.simulationTimer = new Timer(0, null);
         this.running = false;
         this.paused = false;
@@ -170,14 +168,13 @@ public class Simulation {
     }
 
     public void stopScenario() {
-        if (!running && !paused) {
-            return;
-        }
-
         simulationTimer.stop();
 
-        manager.stop();
-
+        try {
+            manager.stop();
+        } catch (NullPointerException ignored) {
+        }
+        
         guests.clear();
         cleaners.clear();
         elevator.getPassengers().clear();

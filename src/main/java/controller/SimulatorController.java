@@ -50,7 +50,17 @@ public class SimulatorController {
         simulation.getSettings().setHte(hte);
         simulation.refreshHte();
     }
-    
+
+    // Geeft huidige scenarioId terug
+    public int getScenarioId() {
+        return simulation.getSettings().getScenarioId();
+    }
+
+    // veranderd het scenarioId
+    public void setScenarioId(int scenarioId) {
+        simulation.getSettings().setScenarioId(scenarioId);
+    }
+
     // Geeft alle gasten terug
     public HashMap<Integer, Guest> getGuests() {
         return simulation.getGuests();

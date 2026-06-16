@@ -18,20 +18,15 @@ public class SimulationEventListener implements HotelEventListener {
     // Wordt uitgevoerd wanneer een event ontvangen wordt
     @Override
     public void notify(HotelEvent hotelEvent) {
-
-        // Debug informatie tonen in console
-        System.out.println(
-                "event ontvangen "
-                        + "time=" + hotelEvent.getTime() + " "
-                        + "type=" + hotelEvent.getEventType() + " "
-                        + "data=" + hotelEvent.getData() + " "
-                        + "guestId=" + hotelEvent.getGuestId()
-        );
+        if("NONE".equals(hotelEvent.getEventType().toString())) {
+            return;
+        }
 
         // Door alle handlers lopen en controleert welke handler geschikt is 
         for (SimulationEventHandler handler : handlers) {
             if (handler.canHandle(hotelEvent)) {
                 handler.handleEvent(hotelEvent);
+                break;
             }
         }
     }
