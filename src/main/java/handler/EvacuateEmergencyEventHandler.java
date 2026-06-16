@@ -6,6 +6,8 @@ import hotelevents.HotelEvent;
 import model.Guest;
 import model.SubTile;
 import model.Tile;
+import model.Person.PersonGoal;
+import model.Person.PersonState;
 import pathfinding.AStarPathFinding;
 import simulation.Simulation;
 
@@ -26,33 +28,54 @@ public class EvacuateEmergencyEventHandler implements SimulationEventHandler {
     @Override
     public void handleEvent(HotelEvent event) {
         evacuating = true;
-        // Look up the lobby tile once, before looping — not once per guest
-        Tile lobbyTile = simulation.findAreaType("lobby");
-
-        if (lobbyTile == null) {
-            return;
-        }
-
         for (Guest guest : simulation.getGuests().values()) {
-            // Skip null entries defensively
             if (guest == null) {
+                continue;
+            }
+
+            SubTile lobbyTile = simulation.getGrid().findSubTileByAreaType("lobby");
+
+            if (lobbyTile == null) {
                 continue;
             }
 
             SubTile currentSubtile = guest.getCurrentSubTile();
 
-            List<SubTile> path = new AStarPathFinding().findPathToTile(currentSubtile, lobbyTile);
+            Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(currentSubtile);
+            Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(currentSubtile);
 
-            // If no path exists for this guest, skip them — don't stop the whole evacuation
-            if (path.isEmpty()) {
+            if (liftTile == null && stairTile == null) {
                 continue;
             }
 
-            path.remove(0);
+            AStarPathFinding aStarPathFinding = new AStarPathFinding();
+
+            List<SubTile> pathToLift = aStarPathFinding.findPathToTile(currentSubtile, liftTile);
+            List<SubTile> pathToStairs = aStarPathFinding.findPathToTile(currentSubtile, stairTile);
+
+            if (pathToLift.isEmpty() && pathToStairs.isEmpty()) {
+                continue;
+            }
+
+            if (pathToLift.isEmpty() || (!pathToStairs.isEmpty() && pathToLift.size() > pathToStairs.size())) {
+                pathToStairs.remove(0);
+                if (!pathToStairs.isEmpty()) {
+                    pathToStairs.remove(pathToStairs.size() - 1);
+                }
+                guest.setPath(pathToStairs);
+                guest.setPersonState(PersonState.WALKING_TO_STAIRS);
+            } else {
+                pathToLift.remove(0);
+                if (!pathToLift.isEmpty()) {
+                    pathToLift.remove(pathToLift.size() - 1);
+                }
+                guest.setPath(pathToLift);
+                guest.setPersonState(PersonState.WALKING_TO_LIFT);
+            }
 
             guest.setCheckingOut(true);
-            guest.setTargetTile(lobbyTile);
-            guest.setPath(path);
+            guest.setTargetSubTile(lobbyTile);
+            guest.setPersonGoal(PersonGoal.EVACUATE);
         }
     }
 }

@@ -33,14 +33,14 @@ public class GoToFitnessEventHandler implements SimulationEventHandler {
 
         SubTile currenSubTile = guest.getCurrentSubTile();
 
-        Tile fitnessTile = simulation.findAreaType("fitness");
+        SubTile fitnessTile = simulation.getGrid().findSubTileByAreaType("fitness");
 
         if(fitnessTile == null) {
             return;
         }
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(currenSubTile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(currenSubTile);
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(currenSubTile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(currenSubTile);
 
         if (stairTile == null && liftTile == null) {
             return;
@@ -71,7 +71,7 @@ public class GoToFitnessEventHandler implements SimulationEventHandler {
             guest.setPersonState(PersonState.WALKING_TO_LIFT);
         }
 
-        guest.setTargetTile(fitnessTile);
+        guest.setTargetSubTile(fitnessTile);
         guest.setPersonGoal(PersonGoal.FITNESS);
     }
 }

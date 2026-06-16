@@ -84,7 +84,7 @@ public class ElevatorHandler {
     public void sendElevatorToNextTarget() {
         if (!elevator.getPassengers().isEmpty()) {
             Person person = elevator.getPassengers().get(0);
-            elevator.callToLevel(person.getTargetTile().getY());
+            elevator.callToLevel(person.getTargetSubTile().getParentTile().getY());
             return;
         }
 
@@ -113,14 +113,14 @@ public class ElevatorHandler {
         }
 
         if (person.getPersonGoal() == PersonGoal.CHECKIN) {
-            Area room = person.getTargetTile().getArea();
+            Area room = person.getTargetSubTile().getParentTile().getArea();
 
             if (room == null || room.getGuest() != person) {
                 return false;
             }
         }
 
-        List<SubTile> path = new AStarPathFinding().findPathToTile(exitSubTile, person.getTargetTile());
+        List<SubTile> path = new AStarPathFinding().findPath(exitSubTile, person.getTargetSubTile());
 
         if (path.isEmpty()) {
             return false;
@@ -142,7 +142,7 @@ public class ElevatorHandler {
         for (Iterator<Person> iterator = elevator.getPassengers().iterator(); iterator.hasNext();) {
             Person person = iterator.next();
 
-            if (person.getTargetTile().getY() == currentLevel) {
+            if (person.getTargetSubTile().getParentTile().getY() == currentLevel) {
                 if (exitElevator(person)) {
                     iterator.remove();
                 }

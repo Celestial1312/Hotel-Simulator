@@ -13,6 +13,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,9 +26,9 @@ import loader.GridLoader;
 import model.Area;
 
 public class SidebarPanel extends JPanel {
+    private final SimulatorController controller;
     private SimulationClock simulationClock;
     private RealTimeClock realTimeClock;
-    private final SimulatorController controller;
     private boolean layoutChosen = false;
 
     public SidebarPanel(SimulatorController controller) {
@@ -93,7 +94,7 @@ public class SidebarPanel extends JPanel {
                         JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            controller.startScenario(4);
+            controller.startScenario(controller.getScenarioId());
             simulationClock.start();
 
             startButton.setEnabled(false);
@@ -238,16 +239,17 @@ public class SidebarPanel extends JPanel {
     }
 
     private void openSettings() {
-
         JFrame settingsFrame = new JFrame("Instellingen");
 
-        settingsFrame.setSize(300, 200);
+        settingsFrame.setSize(240, 150);
 
         settingsFrame.setLayout(new FlowLayout());
 
         JLabel label = new JLabel("Simulation speed:");
 
-        JSlider speedSlider = new JSlider(1, 10, 1);
+        int currentSpeed = Math.max(1, Math.min(10, 1000 / controller.getHte()));
+
+        JSlider speedSlider = new JSlider(1, 10, currentSpeed);
 
         speedSlider.setMajorTickSpacing(1);
 
@@ -255,23 +257,35 @@ public class SidebarPanel extends JPanel {
 
         speedSlider.setPaintLabels(true);
 
+        JLabel scenarioLabel = new JLabel("Scenario:");
+
+        JComboBox<Integer> scenarioDropdown = new JComboBox<>(new Integer[] { 1, 2, 3, 4 });
+
+        scenarioDropdown.setSelectedItem(controller.getScenarioId());
 
         JButton saveButton = new JButton("Save");
 
         saveButton.addActionListener(e -> {
 
-            int value = speedSlider.getValue();
-
-            controller.setHte(1000 / value);
+            controller.setHte(1000 / speedSlider.getValue());
             simulationClock.setHte(controller.getHte());
-            
+
+            Integer scenarioId = (Integer) scenarioDropdown.getSelectedItem();
+
+            if (scenarioId != null) {
+                controller.setScenarioId(scenarioId);
+            }
+
             settingsFrame.dispose();
         });
 
         settingsFrame.add(label);
         settingsFrame.add(speedSlider);
+        settingsFrame.add(scenarioLabel);
+        settingsFrame.add(scenarioDropdown);
         settingsFrame.add(saveButton);
 
+        settingsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         settingsFrame.setLocationRelativeTo(this);
 
         settingsFrame.setVisible(true);

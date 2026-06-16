@@ -25,7 +25,6 @@ public class MovementHandler {
 
     public void movePeopleOneStep() {
         elevatorHandler.update();
-        stairHandler.update();
 
         for (Iterator<Guest> iterator = simulation.getGuests().values().iterator(); iterator.hasNext();) {
             Guest guest = iterator.next();
@@ -49,7 +48,8 @@ public class MovementHandler {
             if (guest.getPersonState() == PersonState.WALKING_TO_DESTINATION
                     && !guest.hasPath()) {
 
-                if (guest.getPersonGoal() == PersonGoal.CHECKOUT) {
+                if (guest.getPersonGoal() == PersonGoal.CHECKOUT
+                        || guest.getPersonGoal() == PersonGoal.EVACUATE) {
                     checkOutGuest(guest, iterator);
                     continue;
                 }
@@ -93,6 +93,8 @@ public class MovementHandler {
                 cleanerCleaning(cleaner, iterator);
             }
         }
+        
+        stairHandler.update();
     }
 
     private void movePersonOneStep(Person person) {

@@ -33,14 +33,14 @@ public class CheckOutEventHandler implements SimulationEventHandler {
 
         SubTile startSubtile = guest.getCurrentSubTile();
 
-        Tile lobbyTile = simulation.findAreaType("lobby");
+        SubTile lobbyTile = simulation.getGrid().findSubTileByAreaType("lobby");
 
         if(lobbyTile == null) {
             return;
         }
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(startSubtile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(startSubtile);
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(startSubtile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(startSubtile);
 
         if (liftTile == null && stairTile == null) {
             return;
@@ -72,7 +72,7 @@ public class CheckOutEventHandler implements SimulationEventHandler {
         }
 
         guest.setCheckingOut(true);
-        guest.setTargetTile(lobbyTile);
+        guest.setTargetSubTile(lobbyTile);
         guest.setPersonGoal(PersonGoal.CHECKOUT);
     }
 

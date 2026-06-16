@@ -39,10 +39,14 @@ public class CleaningEmergencyEventHandler implements SimulationEventHandler {
             return;
         }
 
-        Tile guestRoomTile = simulation.getGrid().getTile(guestRoom.getX(), guestRoom.getY());
+        SubTile guestRoomSubTile = simulation.getGrid().findSubTileInArea(guestRoom);
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(spawnSubTile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(spawnSubTile);
+        if (guestRoomSubTile == null) {
+            return;
+        }
+
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(spawnSubTile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(spawnSubTile);
 
         if (liftTile == null && stairTile == null) {
             return;
@@ -79,7 +83,7 @@ public class CleaningEmergencyEventHandler implements SimulationEventHandler {
         guestRoom.setState(AreaState.BEING_CLEANED);
         spawnSubTile.setPerson(cleaner);
         simulation.getCleaners().put(event.getGuestId(), cleaner);
-        cleaner.setTargetTile(guestRoomTile);
+        cleaner.setTargetSubTile(guestRoomSubTile);
         cleaner.setPersonGoal(PersonGoal.CLEANING);
     }
 }
