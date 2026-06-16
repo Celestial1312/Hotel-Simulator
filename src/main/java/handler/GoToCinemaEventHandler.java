@@ -33,14 +33,14 @@ public class GoToCinemaEventHandler implements SimulationEventHandler {
 
         SubTile startSubTile = guest.getCurrentSubTile();
 
-        Tile cinemaTile = simulation.findAreaType("cinema");
+        SubTile cinemaTile = simulation.getGrid().findSubTileByAreaType("cinema");
 
         if(cinemaTile == null) {
             return;
         }
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(startSubTile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(startSubTile);
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(startSubTile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(startSubTile);
 
         if (liftTile == null && stairTile == null) {
             return;
@@ -71,7 +71,7 @@ public class GoToCinemaEventHandler implements SimulationEventHandler {
             guest.setPersonState(PersonState.WALKING_TO_LIFT);
         }
 
-        guest.setTargetTile(cinemaTile);
+        guest.setTargetSubTile(cinemaTile);
         guest.setPersonGoal(PersonGoal.CINEMA);
     }
 }

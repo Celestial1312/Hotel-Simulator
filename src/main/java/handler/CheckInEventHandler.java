@@ -43,10 +43,14 @@ public class CheckInEventHandler implements SimulationEventHandler {
             return;
         }
 
-        Tile roomTile = simulation.getGrid().getTile(room.getX(), room.getY());
+        SubTile roomSubTile = simulation.getGrid().findSubTileInArea(room);
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(spawnSubTile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(spawnSubTile);
+        if (roomSubTile == null) {
+            return;
+        }
+
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(spawnSubTile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(spawnSubTile);
 
         if (liftTile == null && stairTile == null) {
             room.setState(AreaState.AVAILABLE);
@@ -85,7 +89,7 @@ public class CheckInEventHandler implements SimulationEventHandler {
         spawnSubTile.setPerson(guest);
         simulation.getGuests().put(event.getGuestId(), guest);
 
-        guest.setTargetTile(roomTile);
+        guest.setTargetSubTile(roomSubTile);
         guest.setPersonGoal(PersonGoal.CHECKIN);
     }
 

@@ -71,7 +71,7 @@ public class StairHandler {
     }
 
     private void exitStairs(Person person) {
-        int targetLevel = person.getTargetTile().getY();
+        int targetLevel = person.getTargetSubTile().getParentTile().getY();
 
         Tile stairTile = findStairTileOnLevel(targetLevel);
 
@@ -85,7 +85,7 @@ public class StairHandler {
             return;
         }
 
-        List<SubTile> path = new AStarPathFinding().findPathToTile(exitSubTile, person.getTargetTile());
+        List<SubTile> path = new AStarPathFinding().findPath(exitSubTile, person.getTargetSubTile());
         
         if(path.isEmpty()) {
             return;
@@ -109,7 +109,7 @@ public class StairHandler {
 
             int startLevel = person.getCurrentSubTile().getParentTile().getY();
 
-            int targetLevel = person.getTargetTile().getY();
+            int targetLevel = person.getTargetSubTile().getParentTile().getY();
 
             int requiredTicks = Math.abs(targetLevel - startLevel) * stair.getTicksPerLevel();
 

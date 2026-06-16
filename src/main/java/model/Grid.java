@@ -171,7 +171,105 @@ public class Grid {
             return null;
         }
 
-
         return allLobbySubTiles.get(random.nextInt(allLobbySubTiles.size()));
+    }
+
+    public Tile findElevatorTileOnSameLevel(SubTile subTile) {
+        int guestY = subTile.getParentTile().getY();
+
+        for (int x = 0; x < getSizeX(); x++) {
+            Tile tile = getTile(x, guestY);
+
+            if (tile == null || tile.getArea() == null) {
+                continue;
+            }
+
+            if (tile.getArea().getAreaType().equalsIgnoreCase("lift")) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public Tile findStairTileOnSameLevel(SubTile subTile) {
+        int guestY = subTile.getParentTile().getY();
+
+        for (int x = 0; x < getSizeX(); x++) {
+            Tile tile = getTile(x, guestY);
+
+            if (tile == null || tile.getArea() == null) {
+                continue;
+            }
+
+            if (tile.getArea().getAreaType().equalsIgnoreCase("stairs")) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public SubTile findSubTileByAreaType(String areaType) {
+        Random random = new Random();
+        List<SubTile> allAreaTypeSubTiles = new ArrayList<>();
+
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                Tile currentTile = tiles[y][x];
+
+                if (currentTile.getArea() == null) {
+                    continue;
+                }
+
+                if (!areaType.equalsIgnoreCase(currentTile.getArea().getAreaType())) {
+                    continue;
+                }
+
+                SubTile[][] subTiles = currentTile.getSubTiles();
+
+                for (int subY = 0; subY < subTiles.length; subY++) {
+                    for (int subX = 0; subX < subTiles[subY].length; subX++) {
+                        SubTile subTile = subTiles[subY][subX];
+
+                        if (subTile.getPerson() == null) {
+                            allAreaTypeSubTiles.add(subTile);
+                        }
+                    }
+                }
+            }
+        }
+        if (allAreaTypeSubTiles.isEmpty()) {
+            return null;
+        }
+
+        return allAreaTypeSubTiles.get(random.nextInt(allAreaTypeSubTiles.size()));
+    }
+
+    public SubTile findSubTileInArea(Area area) {
+        Random random = new Random();
+        List<SubTile> freeSubTiles = new ArrayList<>();
+
+        for (int y = area.getY(); y < area.getY() + area.getHeight(); y++) {
+            for (int x = area.getX(); x < area.getX() + area.getWidth(); x++) {
+                Tile tile = getTile(x, y);
+
+                if (tile == null) {
+                    continue;
+                }
+
+                for (SubTile[] row : tile.getSubTiles()) {
+                    for (SubTile subTile : row) {
+                        if (subTile.getPerson() == null) {
+                            freeSubTiles.add(subTile);
+                        }
+                    }
+                }
+            }
+        }
+
+        if (freeSubTiles.isEmpty()) {
+            return null;
+        }
+
+        return freeSubTiles.get(random.nextInt(freeSubTiles.size()));
     }
 }

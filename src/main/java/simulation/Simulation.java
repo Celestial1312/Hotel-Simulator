@@ -28,8 +28,6 @@ import model.Elevator;
 import model.Grid;
 import model.Guest;
 import model.Stair;
-import model.SubTile;
-import model.Tile;
 import ui.SimulationFrame;
 
 public class Simulation {
@@ -211,24 +209,6 @@ public class Simulation {
         }
     }
 
-    public Tile findAreaType(String areaType) {
-        for (int y = 0; y < grid.getSizeY(); y++) {
-            for (int x = 0; x < grid.getSizeX(); x++) {
-                Tile tile = grid.getTile(x, y);
-
-                if (tile.getArea() == null) {
-                    continue;
-                }
-
-                if (areaType.equalsIgnoreCase(tile.getArea().getAreaType())) {
-                    return tile;
-                }
-            }
-        }
-
-        return null;
-    }
-
     public Area findGuestRoom(int guestId) {
         for (Area room : rooms) {
             Guest guest = room.getGuest();
@@ -242,40 +222,6 @@ public class Simulation {
             }
         }
 
-        return null;
-    }
-
-    public Tile findElevatorTileOnSameLevel(SubTile subTile) {
-        int guestY = subTile.getParentTile().getY();
-
-        for (int x = 0; x < grid.getSizeX(); x++) {
-            Tile tile = grid.getTile(x, guestY);
-
-            if (tile == null || tile.getArea() == null) {
-                continue;
-            }
-
-            if (tile.getArea().getAreaType().equalsIgnoreCase("lift")) {
-                return tile;
-            }
-        }
-        return null;
-    }
-
-    public Tile findStairTileOnSameLevel(SubTile subTile) {
-        int guestY = subTile.getParentTile().getY();
-
-        for (int x = 0; x < grid.getSizeX(); x++) {
-            Tile tile = grid.getTile(x, guestY);
-
-            if (tile == null || tile.getArea() == null) {
-                continue;
-            }
-
-            if (tile.getArea().getAreaType().equalsIgnoreCase("stairs")) {
-                return tile;
-            }
-        }
         return null;
     }
 

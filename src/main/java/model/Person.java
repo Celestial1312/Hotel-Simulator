@@ -22,12 +22,13 @@ public abstract class Person {
         FOOD,
         FITNESS,
         CINEMA,
-        CLEANING
+        CLEANING,
+        EVACUATE
     }
 
     private int id;
     private SubTile currentSubTile;
-    private Tile targetTile;
+    private SubTile targetSubTile;
     private SubTile nextStep;
     private List<SubTile> path = new ArrayList<>();
     private PersonState personState;
@@ -46,8 +47,8 @@ public abstract class Person {
         return currentSubTile;
     }
 
-    public Tile getTargetTile() {
-        return targetTile;
+    public SubTile getTargetSubTile() {
+        return targetSubTile;
     }
 
     public SubTile getNextStep() {
@@ -74,8 +75,8 @@ public abstract class Person {
         this.id = id;
     }
 
-    public void setTargetTile(Tile targetTile) {
-        this.targetTile = targetTile;
+    public void setTargetSubTile(SubTile targetSubTile) {
+        this.targetSubTile = targetSubTile;
     }
 
     public void setPath(List<SubTile> path) {

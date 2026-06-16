@@ -33,14 +33,14 @@ public class NeedFoodEventHandler implements SimulationEventHandler {
 
         SubTile currentSubTile = guest.getCurrentSubTile();
 
-        Tile restaurantTile = simulation.findAreaType("restaurant");
+        SubTile restaurantTile = simulation.getGrid().findSubTileByAreaType("restaurant");
 
         if(restaurantTile == null) {
             return;
         }
 
-        Tile liftTile = simulation.findElevatorTileOnSameLevel(currentSubTile);
-        Tile stairTile = simulation.findStairTileOnSameLevel(currentSubTile);
+        Tile liftTile = simulation.getGrid().findElevatorTileOnSameLevel(currentSubTile);
+        Tile stairTile = simulation.getGrid().findStairTileOnSameLevel(currentSubTile);
 
         if (liftTile == null && stairTile == null) {
             return;
@@ -71,7 +71,7 @@ public class NeedFoodEventHandler implements SimulationEventHandler {
             guest.setPersonState(PersonState.WALKING_TO_LIFT);
         }
 
-        guest.setTargetTile(restaurantTile);
+        guest.setTargetSubTile(restaurantTile);
         guest.setPersonGoal(PersonGoal.FOOD);
     }
 
